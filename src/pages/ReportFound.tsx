@@ -3,7 +3,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, MapPin, Clock, Image } from "lucide-react";
+import { CalendarIcon, MapPin, Image, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +28,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { ChatInterface } from "@/components/ChatInterface";
 
 const formSchema = z.object({
   itemName: z.string().min(2, {
@@ -41,9 +42,6 @@ const formSchema = z.object({
   }),
   foundDate: z.date({
     required_error: "Please select a date when you found the item.",
-  }),
-  contactInfo: z.string().min(5, {
-    message: "Contact information is required.",
   }),
   imageFile: z.instanceof(FileList).optional(),
 });
@@ -61,7 +59,6 @@ const ReportFound = () => {
       itemName: "",
       description: "",
       location: "",
-      contactInfo: "",
     },
   });
 
@@ -197,22 +194,17 @@ const ReportFound = () => {
                     />
                   </div>
 
-                  <FormField
-                    control={form.control}
-                    name="contactInfo"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-lg">Contact Information</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Phone number or email" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          This will be shared with the person claiming the item.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Chat Interface Section */}
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <div className="flex items-center gap-2 mb-4">
+                      <MessageCircle className="w-5 h-5 text-mustard" />
+                      <h3 className="text-lg font-medium">Anonymous Chat</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      After submission, users can communicate with you anonymously through this chat without sharing personal information.
+                    </p>
+                    <ChatInterface reportId="sample-report-id" />
+                  </div>
 
                   <FormField
                     control={form.control}
