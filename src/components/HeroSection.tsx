@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -26,11 +27,11 @@ const HeroSection = () => {
             A smart way to reunite lost items with their owners on campus. Report, match, and reclaim with ease.
           </p>
           <div className="flex flex-wrap gap-4 mt-4">
-            <Button className="btn-primary text-lg">
-              I Lost Something
+            <Button className="btn-primary text-lg" asChild>
+              <Link to="/report-lost">I Lost Something</Link>
             </Button>
-            <Button variant="outline" className="btn-outline text-lg">
-              I Found Something
+            <Button variant="outline" className="btn-outline text-lg" asChild>
+              <Link to="/report-found">I Found Something</Link>
             </Button>
           </div>
         </motion.div>
