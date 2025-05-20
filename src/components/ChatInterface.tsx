@@ -58,12 +58,13 @@ export const ChatInterface = ({ reportId }: ChatInterfaceProps) => {
   };
 
   return (
-    <div className="border rounded-lg overflow-hidden bg-gray-50">
-      <div className="bg-gray-100 p-3 border-b">
+    <div className="border rounded-lg overflow-hidden bg-white shadow-md">
+      <div className="bg-blue-50 p-3 border-b flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-mustard" />
-          <h4 className="font-medium">Anonymous Chat</h4>
+          <MessageCircle className="w-5 h-5 text-blue-500" />
+          <h4 className="font-medium">Chat with seller</h4>
         </div>
+        <span className="text-xs text-gray-500">ID: {reportId.substring(0, 8)}</span>
       </div>
       
       <div className="h-60 overflow-y-auto p-4 flex flex-col gap-3">
@@ -73,8 +74,8 @@ export const ChatInterface = ({ reportId }: ChatInterfaceProps) => {
             className={cn(
               "max-w-[80%] p-3 rounded-lg",
               message.sender === "user" 
-                ? "bg-mustard/10 ml-auto rounded-tr-none" 
-                : "bg-gray-200 mr-auto rounded-tl-none"
+                ? "bg-blue-50 ml-auto rounded-tr-none" 
+                : "bg-gray-100 mr-auto rounded-tl-none"
             )}
           >
             <p className="text-sm">{message.text}</p>
@@ -85,7 +86,7 @@ export const ChatInterface = ({ reportId }: ChatInterfaceProps) => {
         ))}
       </div>
       
-      <form onSubmit={handleSendMessage} className="p-3 border-t flex gap-2">
+      <form onSubmit={handleSendMessage} className="p-3 border-t flex gap-2 bg-gray-50">
         <Input
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
@@ -94,7 +95,7 @@ export const ChatInterface = ({ reportId }: ChatInterfaceProps) => {
         />
         <Button 
           type="submit" 
-          className="bg-mustard hover:bg-mustard/90"
+          className="bg-blue-500 hover:bg-blue-600"
         >
           <Send className="h-4 w-4" />
           <span className="sr-only">Send</span>
