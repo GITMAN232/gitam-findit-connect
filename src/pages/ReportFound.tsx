@@ -3,7 +3,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, MapPin, Image, MessageCircle } from "lucide-react";
+import { CalendarIcon, MapPin, Image, Mail, Phone } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -28,7 +28,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { ChatInterface } from "@/components/ChatInterface";
 
 const formSchema = z.object({
   itemName: z.string().min(2, {
@@ -43,6 +42,10 @@ const formSchema = z.object({
   foundDate: z.date({
     required_error: "Please select a date when you found the item.",
   }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  phone: z.string().optional(),
   imageFile: z.instanceof(FileList).optional(),
 });
 
@@ -59,6 +62,8 @@ const ReportFound = () => {
       itemName: "",
       description: "",
       location: "",
+      email: "",
+      phone: "",
     },
   });
 
@@ -194,16 +199,51 @@ const ReportFound = () => {
                     />
                   </div>
 
-                  {/* Chat Interface Section */}
+                  {/* Contact Information Section */}
                   <div className="mt-6 pt-6 border-t border-gray-200">
-                    <div className="flex items-center gap-2 mb-4">
-                      <MessageCircle className="w-5 h-5 text-mustard" />
-                      <h3 className="text-lg font-medium">Anonymous Chat</h3>
-                    </div>
+                    <h3 className="text-lg font-medium mb-4">Contact Information</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      After submission, users can communicate with you anonymously through this chat without sharing personal information.
+                      Please provide your contact information so we can reach out to you if someone claims this item.
                     </p>
-                    <ChatInterface reportId="sample-report-id" />
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-lg flex items-center gap-2">
+                              <Mail className="w-4 h-4" />
+                              Email
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="your.email@example.com" type="email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-lg flex items-center gap-2">
+                              <Phone className="w-4 h-4" />
+                              Phone (Optional)
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="+91 9876543210" type="tel" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            <FormDescription>
+                              Your contact information will only be shared with GITAM staff.
+                            </FormDescription>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
 
                   <FormField
