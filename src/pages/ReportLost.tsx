@@ -1,15 +1,18 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, MapPin, Clock, Image } from "lucide-react";
+import { CalendarIcon, MapPin, Image } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from "uuid";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/contexts/AuthContext";
 import {
   Form,
   FormControl,
@@ -53,7 +56,9 @@ type FormValues = z.infer<typeof formSchema>;
 const ReportLost = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+  const { user } = useAuth();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -61,22 +66,74 @@ const ReportLost = () => {
       itemName: "",
       description: "",
       location: "",
-      contactInfo: "",
+      contactInfo: user?.email || "",
     },
   });
 
-  const onSubmit = (values: FormValues) => {
-    console.log(values);
-    toast({
-      title: "Report submitted",
-      description: "Your lost item report has been submitted successfully.",
-    });
-    
-    // In a real app, this would send the data to an API
-    // For now, we'll just redirect back to home after a short delay
-    setTimeout(() => {
-      navigate("/");
-    }, 2000);
+  const onSubmit = async (values: FormValues) => {
+    try {
+      setIsSubmitting(true);
+      
+      let imageUrl = null;
+      
+      // Upload image if provided
+      if (values.imageFile && values.imageFile.length > 0) {
+        const file = values.imageFile[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+        const filePath = `lost-items/${fileName}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('item-images')
+          .upload(filePath, file);
+          
+        if (uploadError) {
+          throw uploadError;
+        }
+        
+        // Get public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('item-images')
+          .getPublicUrl(filePath);
+          
+        imageUrl = publicUrlData.publicUrl;
+      }
+      
+      // Insert record into database
+      const { error } = await supabase.from('lost_items').insert({
+        user_id: user?.id,
+        item_name: values.itemName,
+        description: values.description,
+        location: values.location,
+        lost_date: values.lostDate.toISOString(),
+        contact_info: values.contactInfo,
+        image_url: imageUrl,
+        status: 'active'
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Report submitted",
+        description: "Your lost item report has been submitted successfully.",
+      });
+      
+      // Redirect back to listings page after a short delay
+      setTimeout(() => {
+        navigate("/listings");
+      }, 2000);
+      
+    } catch (error: any) {
+      toast({
+        title: "Error submitting report",
+        description: error.message || "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -204,7 +261,11 @@ const ReportLost = () => {
                       <FormItem>
                         <FormLabel className="text-lg">Contact Information</FormLabel>
                         <FormControl>
-                          <Input placeholder="Phone number or email" {...field} />
+                          <Input 
+                            placeholder="Phone number or email" 
+                            {...field} 
+                            defaultValue={user?.email || ""}
+                          />
                         </FormControl>
                         <FormDescription>
                           This will be used to contact you if your item is found.
@@ -272,8 +333,9 @@ const ReportLost = () => {
                       type="submit" 
                       className="w-full md:w-auto bg-maroon hover:bg-maroon/90 text-white"
                       size="lg"
+                      disabled={isSubmitting}
                     >
-                      Submit Report
+                      {isSubmitting ? "Submitting..." : "Submit Report"}
                     </Button>
                   </div>
                 </form>

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -7,9 +7,12 @@ import { CalendarIcon, MapPin, Image, Mail, Phone } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from "uuid";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/contexts/AuthContext";
 import {
   Form,
   FormControl,
@@ -54,7 +57,9 @@ type FormValues = z.infer<typeof formSchema>;
 const ReportFound = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+  const { user } = useAuth();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -62,23 +67,76 @@ const ReportFound = () => {
       itemName: "",
       description: "",
       location: "",
-      email: "",
+      email: user?.email || "",
       phone: "",
     },
   });
 
-  const onSubmit = (values: FormValues) => {
-    console.log(values);
-    toast({
-      title: "Report submitted",
-      description: "Your found item report has been submitted successfully.",
-    });
-    
-    // In a real app, this would send the data to an API
-    // For now, we'll just redirect back to home after a short delay
-    setTimeout(() => {
-      navigate("/");
-    }, 2000);
+  const onSubmit = async (values: FormValues) => {
+    try {
+      setIsSubmitting(true);
+      
+      let imageUrl = null;
+      
+      // Upload image if provided
+      if (values.imageFile && values.imageFile.length > 0) {
+        const file = values.imageFile[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+        const filePath = `found-items/${fileName}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('item-images')
+          .upload(filePath, file);
+          
+        if (uploadError) {
+          throw uploadError;
+        }
+        
+        // Get public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('item-images')
+          .getPublicUrl(filePath);
+          
+        imageUrl = publicUrlData.publicUrl;
+      }
+      
+      // Insert record into database
+      const { error } = await supabase.from('found_items').insert({
+        user_id: user?.id,
+        item_name: values.itemName,
+        description: values.description,
+        location: values.location,
+        found_date: values.foundDate.toISOString(),
+        email: values.email,
+        phone: values.phone || null,
+        image_url: imageUrl,
+        status: 'active'
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Report submitted",
+        description: "Your found item report has been submitted successfully.",
+      });
+      
+      // Redirect back to listings page after a short delay
+      setTimeout(() => {
+        navigate("/listings");
+      }, 2000);
+      
+    } catch (error: any) {
+      toast({
+        title: "Error submitting report",
+        description: error.message || "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,7 +275,12 @@ const ReportFound = () => {
                               Email
                             </FormLabel>
                             <FormControl>
-                              <Input placeholder="your.email@example.com" type="email" {...field} />
+                              <Input 
+                                placeholder="your.email@example.com" 
+                                type="email" 
+                                {...field}
+                                defaultValue={user?.email || ""} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -304,8 +367,9 @@ const ReportFound = () => {
                       type="submit" 
                       className="w-full md:w-auto bg-mustard hover:bg-mustard/90 text-white"
                       size="lg"
+                      disabled={isSubmitting}
                     >
-                      Submit Report
+                      {isSubmitting ? "Submitting..." : "Submit Report"}
                     </Button>
                   </div>
                 </form>

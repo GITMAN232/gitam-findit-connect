@@ -1,11 +1,22 @@
 
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +30,18 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user || !user.email) return "U";
+    const email = user.email;
+    return email.charAt(0).toUpperCase();
+  };
 
   return (
     <nav
@@ -52,9 +75,42 @@ const Navbar = () => {
           <Link to="/listings" className="font-medium hover:text-maroon transition-colors">
             View Listings
           </Link>
-          <Button className="bg-maroon hover:bg-maroon/90 text-white ml-4">
-            Login
-          </Button>
+          
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar>
+                    <AvatarImage src={user.user_metadata?.avatar_url} />
+                    <AvatarFallback className="bg-maroon text-white">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium">{user.email}</p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={handleSignOut}
+                >
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button 
+              className="bg-maroon hover:bg-maroon/90 text-white ml-4"
+              onClick={() => navigate('/login')}
+            >
+              Login
+            </Button>
+          )}
         </div>
 
         {/* Mobile Toggle Button */}
@@ -89,9 +145,29 @@ const Navbar = () => {
           <Link to="/listings" className="font-medium hover:text-maroon transition-colors" onClick={() => setMobileMenuOpen(false)}>
             View Listings
           </Link>
-          <Button className="bg-maroon hover:bg-maroon/90 text-white w-full" onClick={() => setMobileMenuOpen(false)}>
-            Login
-          </Button>
+          
+          {user ? (
+            <Button 
+              variant="ghost" 
+              className="justify-start px-0 font-medium text-destructive" 
+              onClick={() => {
+                handleSignOut();
+                setMobileMenuOpen(false);
+              }}
+            >
+              Sign out ({user.email})
+            </Button>
+          ) : (
+            <Button 
+              className="bg-maroon hover:bg-maroon/90 text-white w-full" 
+              onClick={() => {
+                navigate('/login');
+                setMobileMenuOpen(false);
+              }}
+            >
+              Login
+            </Button>
+          )}
         </div>
       )}
     </nav>

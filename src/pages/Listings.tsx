@@ -1,14 +1,24 @@
 
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+  Search,
+  MapPin,
+  Calendar,
+  Filter,
+  ArrowLeft,
+  ArrowRight,
+  Clock,
+  Mail,
+  Phone,
+} from "lucide-react";
+import { format } from "date-fns";
+
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -16,313 +26,472 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { supabase } from "@/contexts/AuthContext";
 
-// Mock data - in a real app, this would come from an API
-const mockItems = [
-  {
-    id: 1,
-    title: "iPhone 14 Pro",
-    type: "Lost",
-    category: "Electronics",
-    location: "Engineering Block",
-    date: "2025-05-15",
-    description: "Black iPhone 14 Pro with a clear case. Last seen in the Engineering Block.",
-    contactEmail: "john@example.com",
-    thumbnail: null,
-  },
-  {
-    id: 2,
-    title: "Blue Backpack",
-    type: "Found",
-    category: "Bags",
-    location: "Main Library",
-    date: "2025-05-18",
-    description: "Found a blue Jansport backpack with laptop and notebooks inside.",
-    contactEmail: "library@gitam.edu",
-    thumbnail: null,
-  },
-  {
-    id: 3,
-    title: "Student ID Card",
-    type: "Found",
-    category: "Documents",
-    location: "Cafeteria",
-    date: "2025-05-17",
-    description: "Student ID card under the name of Priya Sharma.",
-    contactEmail: "cafeteria@gitam.edu",
-    thumbnail: null,
-  },
-  {
-    id: 4,
-    title: "Black Wallet",
-    type: "Lost",
-    category: "Accessories",
-    location: "Sports Complex",
-    date: "2025-05-16",
-    description: "Black leather wallet with ID, credit cards and some cash.",
-    contactEmail: "mike@example.com",
-    thumbnail: null,
-  },
-  {
-    id: 5,
-    title: "Prescription Glasses",
-    type: "Lost",
-    category: "Accessories",
-    location: "Science Building",
-    date: "2025-05-14",
-    description: "Black-framed prescription glasses in a blue case.",
-    contactEmail: "sarah@example.com",
-    thumbnail: null,
-  },
-  {
-    id: 6,
-    title: "Water Bottle",
-    type: "Found",
-    category: "Others",
-    location: "Gymnasium",
-    date: "2025-05-19",
-    description: "Found a Hydro Flask water bottle, dark blue color.",
-    contactEmail: "gym@gitam.edu",
-    thumbnail: null,
-  },
+// Types for our listings
+interface LostItem {
+  id: number;
+  created_at: string;
+  user_id: string;
+  item_name: string;
+  description: string;
+  location: string;
+  lost_date: string;
+  contact_info: string;
+  image_url: string | null;
+  status: string;
+  type: 'lost';
+}
+
+interface FoundItem {
+  id: number;
+  created_at: string;
+  user_id: string;
+  item_name: string;
+  description: string;
+  location: string;
+  found_date: string;
+  email: string;
+  phone: string | null;
+  image_url: string | null;
+  status: string;
+  type: 'found';
+}
+
+type ListingItem = (LostItem | FoundItem) & {
+  type: 'lost' | 'found';
+};
+
+// Categories for filtering
+const categories = [
+  "All categories",
+  "Electronics",
+  "Books & Notes",
+  "ID Cards",
+  "Keys",
+  "Wallets & Purses",
+  "Clothing",
+  "Accessories",
+  "Others",
 ];
 
-const Listings = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState(searchParams.get("type") || "all");
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
-  const [currentPage, setCurrentPage] = useState(1);
+const PAGE_SIZE = 8;
 
-  // Filter items based on active tab, search query and category
-  const filteredItems = mockItems.filter((item) => {
-    const matchesTab = activeTab === "all" || item.type.toLowerCase() === activeTab.toLowerCase();
-    const matchesSearch = searchQuery === "" || 
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      item.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === "" || item.category === selectedCategory;
-    
-    return matchesTab && matchesSearch && matchesCategory;
+const Listings = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("All categories");
+  const [activeTab, setActiveTab] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedItem, setSelectedItem] = useState<ListingItem | null>(null);
+
+  // Fetch lost items
+  const fetchLostItems = async () => {
+    const { data, error } = await supabase
+      .from("lost_items")
+      .select("*")
+      .order("created_at", { ascending: false });
+      
+    if (error) throw error;
+    return data.map(item => ({ ...item, type: 'lost' }));
+  };
+
+  // Fetch found items
+  const fetchFoundItems = async () => {
+    const { data, error } = await supabase
+      .from("found_items")
+      .select("*")
+      .order("created_at", { ascending: false });
+      
+    if (error) throw error;
+    return data.map(item => ({ ...item, type: 'found' }));
+  };
+
+  // Use React Query to fetch data
+  const { 
+    data: lostItems = [], 
+    isLoading: isLoadingLost 
+  } = useQuery({
+    queryKey: ["lostItems"],
+    queryFn: fetchLostItems,
   });
 
-  // Handle tab change
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    setCurrentPage(1);
-    updateSearchParams(value, searchQuery, selectedCategory);
+  const { 
+    data: foundItems = [], 
+    isLoading: isLoadingFound 
+  } = useQuery({
+    queryKey: ["foundItems"],
+    queryFn: fetchFoundItems,
+  });
+
+  const isLoading = isLoadingLost || isLoadingFound;
+
+  // Filter and paginate items
+  const filteredItems = React.useMemo(() => {
+    let items: ListingItem[] = [];
+    
+    // Apply tab filter first
+    if (activeTab === "all" || activeTab === "lost") {
+      items = [...items, ...lostItems];
+    }
+    if (activeTab === "all" || activeTab === "found") {
+      items = [...items, ...foundItems];
+    }
+
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      items = items.filter(item => 
+        item.item_name.toLowerCase().includes(query) || 
+        item.description.toLowerCase().includes(query) ||
+        item.location.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply category filter
+    if (category !== "All categories") {
+      // In a real app, you would have a category field in your database
+      // For now, we're just searching in the item name and description
+      const categoryQuery = category.toLowerCase();
+      items = items.filter(item => 
+        item.item_name.toLowerCase().includes(categoryQuery) || 
+        item.description.toLowerCase().includes(categoryQuery)
+      );
+    }
+
+    return items;
+  }, [lostItems, foundItems, searchQuery, category, activeTab]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredItems.length / PAGE_SIZE);
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const paginatedItems = filteredItems.slice(startIndex, startIndex + PAGE_SIZE);
+
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(1, prev - 1));
   };
 
-  // Handle search
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentPage(1);
-    updateSearchParams(activeTab, searchQuery, selectedCategory);
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages, prev + 1));
   };
 
-  // Handle category change
-  const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
-    setCurrentPage(1);
-    updateSearchParams(activeTab, searchQuery, value);
-  };
-
-  // Update search parameters
-  const updateSearchParams = (type: string, query: string, category: string) => {
-    const params: { type?: string; q?: string; category?: string } = {};
-    if (type !== "all") params.type = type;
-    if (query) params.q = query;
-    if (category) params.category = category;
-    setSearchParams(params);
-  };
-
-  // Pagination
-  const itemsPerPage = 6;
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const currentItems = filteredItems.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Categories from items
-  const categories = [...new Set(mockItems.map((item) => item.category))];
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
+  // Render date based on item type
+  const renderDate = (item: ListingItem) => {
+    if (item.type === 'lost') {
+      return format(new Date(item.lost_date), "PPP");
+    } else {
+      return format(new Date(item.found_date), "PPP");
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="bg-white min-h-screen">
       <Navbar />
-      
-      <main className="flex-grow py-16 mt-16">
+      <div className="pt-28 pb-20">
         <div className="container mx-auto px-4">
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-maroon mb-4">
-              Lost & Found Listings
-            </h1>
-            <p className="text-lg text-gray-600 max-w-3xl">
-              Browse through the lost and found items reported on campus. 
-              Filter by type, search by keywords, or filter by category.
-            </p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-maroon mb-2">
+                Lost & Found Items
+              </h1>
+              <p className="text-gray-600">
+                Browse through all reported lost and found items on campus
+              </p>
+            </div>
+            <div className="mt-4 md:mt-0 flex gap-2">
+              <Button 
+                variant="outline" 
+                className="bg-maroon/10 hover:bg-maroon/20 text-maroon border-maroon"
+                onClick={() => window.location.href="/report-lost"}
+              >
+                Report Lost Item
+              </Button>
+              <Button 
+                variant="outline" 
+                className="bg-mustard/10 hover:bg-mustard/20 text-mustard border-mustard"
+                onClick={() => window.location.href="/report-found"}
+              >
+                Report Found Item
+              </Button>
+            </div>
           </div>
 
-          {/* Filters and Search */}
-          <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-8">
+          {/* Filtering options */}
+          <div className="mb-8 space-y-4">
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Input
+                  placeholder="Search items..."
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <div className="w-full md:w-48">
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger>
+                    <div className="flex items-center">
+                      <Filter size={18} className="mr-2" />
+                      <SelectValue placeholder="All categories" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             <Tabs 
-              defaultValue={activeTab} 
-              onValueChange={handleTabChange}
-              className="mb-6"
+              defaultValue="all" 
+              value={activeTab} 
+              onValueChange={setActiveTab}
+              className="w-full"
             >
-              <TabsList className="grid grid-cols-3 w-full max-w-md">
+              <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="all">All Items</TabsTrigger>
                 <TabsTrigger value="lost">Lost Items</TabsTrigger>
                 <TabsTrigger value="found">Found Items</TabsTrigger>
               </TabsList>
             </Tabs>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <form onSubmit={handleSearch} className="relative col-span-2">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <Input 
-                  type="search" 
-                  placeholder="Search items..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </form>
-
-              <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
-          {/* Results */}
-          <div className="mb-8">
-            <p className="text-gray-600 mb-4">
-              Showing {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
-            </p>
+          {isLoading ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-maroon"></div>
+            </div>
+          ) : (
+            <>
+              {paginatedItems.length === 0 ? (
+                <div className="text-center py-16 text-gray-500">
+                  <div className="text-6xl mb-4">🔎</div>
+                  <h3 className="text-2xl font-medium mb-2">No items found</h3>
+                  <p>
+                    {searchQuery || category !== "All categories"
+                      ? "Try changing your search filters"
+                      : "No items have been reported yet"}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  {paginatedItems.map((item) => (
+                    <Card 
+                      key={`${item.type}-${item.id}`} 
+                      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => setSelectedItem(item)}
+                    >
+                      <div className="h-48 bg-gray-100 relative">
+                        <Badge
+                          className={`absolute top-3 left-3 ${
+                            item.type === "lost"
+                              ? "bg-maroon hover:bg-maroon/80"
+                              : "bg-mustard hover:bg-mustard/80"
+                          }`}
+                        >
+                          {item.type === "lost" ? "Lost" : "Found"}
+                        </Badge>
+                        {item.image_url ? (
+                          <img
+                            src={item.image_url}
+                            alt={item.item_name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-3xl text-gray-400">📦</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <CardContent className="p-4">
+                        <h3 className="text-lg font-semibold line-clamp-1">{item.item_name}</h3>
+                        <p className="text-sm text-gray-600 line-clamp-2 mt-1">{item.description}</p>
+                      </CardContent>
+                      <CardFooter className="px-4 pb-4 pt-0 flex-col items-start">
+                        <div className="w-full space-y-1 text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <MapPin size={14} />
+                            <span className="line-clamp-1">{item.location}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Calendar size={14} />
+                            <span>{renderDate(item)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock size={14} />
+                            <span>{format(new Date(item.created_at), "PP")}</span>
+                          </div>
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              )}
 
-            {filteredItems.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {currentItems.map((item) => (
-                  <Card key={item.id} className="overflow-hidden hover-card">
-                    <div className="h-48 bg-grey/20 relative">
-                      <Badge 
-                        className={`absolute top-3 left-3 ${
-                          item.type === "Lost" ? "bg-maroon/10 text-maroon" : "bg-mustard/20 text-mustard"
-                        }`}
-                      >
-                        {item.type}
-                      </Badge>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-24 h-24 rounded-full bg-grey/30 flex items-center justify-center">
-                          <span className="text-4xl text-grey">📦</span>
+              {/* Pagination controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                  >
+                    <ArrowLeft size={16} />
+                  </Button>
+                  <span className="text-sm">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ArrowRight size={16} />
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Item Detail Dialog */}
+      <Dialog open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
+        <DialogContent className="max-w-3xl overflow-auto max-h-[90vh]">
+          {selectedItem && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+                  <Badge
+                    className={`${
+                      selectedItem.type === "lost"
+                        ? "bg-maroon hover:bg-maroon/80"
+                        : "bg-mustard hover:bg-mustard/80"
+                    }`}
+                  >
+                    {selectedItem.type === "lost" ? "Lost" : "Found"}
+                  </Badge>
+                  {selectedItem.item_name}
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="grid md:grid-cols-2 gap-6 mt-4">
+                <div>
+                  <div className="bg-gray-100 rounded-md overflow-hidden h-60 md:h-80 mb-4 flex items-center justify-center">
+                    {selectedItem.image_url ? (
+                      <img
+                        src={selectedItem.image_url}
+                        alt={selectedItem.item_name}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <div className="text-6xl">📦</div>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h3 className="font-semibold">Description</h3>
+                    <p className="text-gray-700">{selectedItem.description}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-3">Details</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
+                        <div>
+                          <p className="font-medium">Location</p>
+                          <p className="text-gray-600">{selectedItem.location}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
+                        <div>
+                          <p className="font-medium">
+                            {selectedItem.type === "lost" ? "Date Lost" : "Date Found"}
+                          </p>
+                          <p className="text-gray-600">{renderDate(selectedItem)}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <Clock className="h-5 w-5 text-gray-500 mt-0.5" />
+                        <div>
+                          <p className="font-medium">Reported On</p>
+                          <p className="text-gray-600">
+                            {format(new Date(selectedItem.created_at), "PPpp")}
+                          </p>
                         </div>
                       </div>
                     </div>
-                    <CardHeader className="pb-0">
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-xl">{item.title}</CardTitle>
-                        <Badge variant="outline">{item.category}</Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-2">
-                      <div className="flex flex-col gap-2 text-sm text-gray-600 mt-2">
-                        <p className="flex items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          {item.location}
-                        </p>
-                        <p className="flex items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {formatDate(item.date)}
-                        </p>
-                      </div>
-                      <p className="mt-3 text-sm text-gray-700 line-clamp-2">{item.description}</p>
-                    </CardContent>
-                    <CardFooter className="pt-0">
-                      <Button className="w-full" variant="outline">View Details</Button>
-                    </CardFooter>
-                  </Card>
-                ))}
+                  </div>
+                  
+                  <div className="border-t pt-4">
+                    <h3 className="font-semibold mb-3">Contact Information</h3>
+                    <div className="space-y-3">
+                      {selectedItem.type === "lost" ? (
+                        <div className="flex items-start gap-3">
+                          <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
+                          <div>
+                            <p className="font-medium">Contact</p>
+                            <p className="text-gray-600">{selectedItem.contact_info}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-start gap-3">
+                            <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
+                            <div>
+                              <p className="font-medium">Email</p>
+                              <p className="text-gray-600">{selectedItem.email}</p>
+                            </div>
+                          </div>
+                          
+                          {selectedItem.phone && (
+                            <div className="flex items-start gap-3">
+                              <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
+                              <div>
+                                <p className="font-medium">Phone</p>
+                                <p className="text-gray-600">{selectedItem.phone}</p>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-4">
+                    <p className="text-sm text-gray-500">
+                      Please contact the reporter if you have information about this item.
+                      Be prepared to provide identifying details to verify ownership.
+                    </p>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <h3 className="text-xl font-medium mb-2">No items found</h3>
-                <p className="text-gray-600">
-                  Try adjusting your search or filter criteria
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Pagination className="mt-8">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-                
-                {[...Array(totalPages)].map((_, i) => (
-                  <PaginationItem key={i}>
-                    <PaginationLink
-                      onClick={() => setCurrentPage(i + 1)}
-                      isActive={currentPage === i + 1}
-                    >
-                      {i + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                
-                <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            </>
           )}
-        </div>
-      </main>
-      
+        </DialogContent>
+      </Dialog>
       <Footer />
     </div>
   );
