@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -36,37 +37,37 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/contexts/AuthContext";
 
-// Types for our listings
-interface LostItem {
+// Define base types for our database items
+interface BaseItem {
   id: number;
   created_at: string;
   user_id: string;
   item_name: string;
   description: string;
   location: string;
-  lost_date: string;
-  contact_info: string;
   image_url: string | null;
   status: string;
+}
+
+// Types for our listings
+interface LostItem extends BaseItem {
+  lost_date: string;
+  contact_info: string;
   type: 'lost';
 }
 
-interface FoundItem {
-  id: number;
-  created_at: string;
-  user_id: string;
-  item_name: string;
-  description: string;
-  location: string;
+interface FoundItem extends BaseItem {
   found_date: string;
   email: string;
   phone: string | null;
-  image_url: string | null;
-  status: string;
   type: 'found';
 }
 
 type ListingItem = LostItem | FoundItem;
+
+// Database response types (without the type field)
+interface LostItemDB extends Omit<LostItem, 'type'> {}
+interface FoundItemDB extends Omit<FoundItem, 'type'> {}
 
 // Categories for filtering
 const categories = [
@@ -90,26 +91,34 @@ const Listings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState<ListingItem | null>(null);
 
-  // Fetch lost items - fixing the type issue
-  const fetchLostItems = async () => {
+  // Fetch lost items with proper type handling
+  const fetchLostItems = async (): Promise<LostItem[]> => {
     const { data, error } = await supabase
       .from("lost_items")
       .select("*")
       .order("created_at", { ascending: false });
       
     if (error) throw error;
-    return data.map(item => ({ ...item, type: 'lost' as const }));
+    // Add type field to each item to match the LostItem interface
+    return data.map(item => ({
+      ...item, 
+      type: 'lost' as const
+    })) as LostItem[];
   };
 
-  // Fetch found items - fixing the type issue
-  const fetchFoundItems = async () => {
+  // Fetch found items with proper type handling
+  const fetchFoundItems = async (): Promise<FoundItem[]> => {
     const { data, error } = await supabase
       .from("found_items")
       .select("*")
       .order("created_at", { ascending: false });
       
     if (error) throw error;
-    return data.map(item => ({ ...item, type: 'found' as const }));
+    // Add type field to each item to match the FoundItem interface
+    return data.map(item => ({
+      ...item, 
+      type: 'found' as const
+    })) as FoundItem[];
   };
 
   // Use React Query to fetch data
