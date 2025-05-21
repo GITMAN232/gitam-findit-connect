@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -67,9 +66,7 @@ interface FoundItem {
   type: 'found';
 }
 
-type ListingItem = (LostItem | FoundItem) & {
-  type: 'lost' | 'found';
-};
+type ListingItem = LostItem | FoundItem;
 
 // Categories for filtering
 const categories = [
@@ -93,7 +90,7 @@ const Listings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState<ListingItem | null>(null);
 
-  // Fetch lost items
+  // Fetch lost items - fixing the type issue
   const fetchLostItems = async () => {
     const { data, error } = await supabase
       .from("lost_items")
@@ -101,10 +98,10 @@ const Listings = () => {
       .order("created_at", { ascending: false });
       
     if (error) throw error;
-    return data.map(item => ({ ...item, type: 'lost' }));
+    return data.map(item => ({ ...item, type: 'lost' as const }));
   };
 
-  // Fetch found items
+  // Fetch found items - fixing the type issue
   const fetchFoundItems = async () => {
     const { data, error } = await supabase
       .from("found_items")
@@ -112,7 +109,7 @@ const Listings = () => {
       .order("created_at", { ascending: false });
       
     if (error) throw error;
-    return data.map(item => ({ ...item, type: 'found' }));
+    return data.map(item => ({ ...item, type: 'found' as const }));
   };
 
   // Use React Query to fetch data
