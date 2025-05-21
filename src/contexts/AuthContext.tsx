@@ -5,10 +5,19 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 // Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Check if Supabase credentials are available
+let supabase: ReturnType<typeof createClient>;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Supabase credentials are missing. You must set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.');
+  // Provide fallback values for development to prevent crash
+  supabase = createClient('https://placeholder-url.supabase.co', 'placeholder-key');
+} else {
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+}
 
 type AuthContextType = {
   user: User | null;
@@ -33,6 +42,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const { toast } = useToast();
   
   useEffect(() => {
+    // Check if Supabase is properly configured before proceeding
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setIsLoading(false);
+      return;
+    }
+    
     // Check for active session and set up auth state listener
     const checkSession = async () => {
       try {
@@ -171,6 +186,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signUp,
     signOut
   };
+  
+  // Show a message when Supabase credentials are missing
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center">
+          <h2 className="text-xl font-semibold text-red-700 mb-2">Configuration Error</h2>
+          <p className="text-red-600">
+            Supabase credentials are missing. Please make sure you have set the following environment variables:
+          </p>
+          <ul className="list-disc text-left ml-6 mt-3 text-red-600">
+            <li>VITE_SUPABASE_URL</li>
+            <li>VITE_SUPABASE_ANON_KEY</li>
+          </ul>
+          <p className="mt-4 text-gray-700">
+            You need to connect your project to Supabase using the Supabase integration button in the top right corner.
+          </p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <AuthContext.Provider value={value}>
