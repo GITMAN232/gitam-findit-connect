@@ -103,10 +103,15 @@ const Listings = () => {
     if (error) throw error;
     
     // Transform the database results to include the type field
-    return (data || []).map(item => ({
-      ...item as LostItemDB,
-      type: 'lost' as const
-    }));
+    // Use type assertion to tell TypeScript that each item has the shape we expect
+    return (data || []).map(item => {
+      // First assert the item as unknown, then as our expected type
+      const lostItem = item as unknown as LostItemDB;
+      return {
+        ...lostItem,
+        type: 'lost' as const
+      };
+    });
   };
 
   // Fetch found items with proper type handling
@@ -119,10 +124,15 @@ const Listings = () => {
     if (error) throw error;
     
     // Transform the database results to include the type field
-    return (data || []).map(item => ({
-      ...item as FoundItemDB,
-      type: 'found' as const
-    }));
+    // Use type assertion to tell TypeScript that each item has the shape we expect
+    return (data || []).map(item => {
+      // First assert the item as unknown, then as our expected type
+      const foundItem = item as unknown as FoundItemDB;
+      return {
+        ...foundItem,
+        type: 'found' as const
+      };
+    });
   };
 
   // Use React Query to fetch data
