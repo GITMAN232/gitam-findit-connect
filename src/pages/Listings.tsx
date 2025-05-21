@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -49,25 +48,28 @@ interface BaseItem {
   status: string;
 }
 
-// Types for our listings
-interface LostItem extends BaseItem {
+// Database response types (without the type field)
+interface LostItemDB extends BaseItem {
   lost_date: string;
   contact_info: string;
-  type: 'lost';
 }
 
-interface FoundItem extends BaseItem {
+interface FoundItemDB extends BaseItem {
   found_date: string;
   email: string;
   phone: string | null;
+}
+
+// Types for our listings with the type discriminator
+interface LostItem extends LostItemDB {
+  type: 'lost';
+}
+
+interface FoundItem extends FoundItemDB {
   type: 'found';
 }
 
 type ListingItem = LostItem | FoundItem;
-
-// Database response types (without the type field)
-interface LostItemDB extends Omit<LostItem, 'type'> {}
-interface FoundItemDB extends Omit<FoundItem, 'type'> {}
 
 // Categories for filtering
 const categories = [
@@ -99,11 +101,12 @@ const Listings = () => {
       .order("created_at", { ascending: false });
       
     if (error) throw error;
-    // Add type field to each item to match the LostItem interface
-    return data.map(item => ({
-      ...item, 
+    
+    // Transform the database results to include the type field
+    return (data || []).map(item => ({
+      ...item as LostItemDB,
       type: 'lost' as const
-    })) as LostItem[];
+    }));
   };
 
   // Fetch found items with proper type handling
@@ -114,11 +117,12 @@ const Listings = () => {
       .order("created_at", { ascending: false });
       
     if (error) throw error;
-    // Add type field to each item to match the FoundItem interface
-    return data.map(item => ({
-      ...item, 
+    
+    // Transform the database results to include the type field
+    return (data || []).map(item => ({
+      ...item as FoundItemDB,
       type: 'found' as const
-    })) as FoundItem[];
+    }));
   };
 
   // Use React Query to fetch data
