@@ -1,8 +1,8 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/contexts/AuthContext";
-import { ListingItem, LostItem, FoundItem, LostItemDB, FoundItemDB } from "@/types/ListingTypes";
+import { ListingItem } from "@/types/ListingTypes";
+import { fetchLostItems, fetchFoundItems } from "@/services/api";
 
 export const PAGE_SIZE = 8;
 
@@ -10,49 +10,7 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState<ListingItem | null>(null);
 
-  // Fetch lost items with proper type handling
-  const fetchLostItems = async (): Promise<LostItem[]> => {
-    const { data, error } = await supabase
-      .from("lost_items")
-      .select("*")
-      .order("created_at", { ascending: false });
-      
-    if (error) throw error;
-    
-    // Transform the database results to include the type field
-    // Use type assertion to tell TypeScript that each item has the shape we expect
-    return (data || []).map(item => {
-      // First assert the item as unknown, then as our expected type
-      const lostItem = item as unknown as LostItemDB;
-      return {
-        ...lostItem,
-        type: 'lost' as const
-      };
-    });
-  };
-
-  // Fetch found items with proper type handling
-  const fetchFoundItems = async (): Promise<FoundItem[]> => {
-    const { data, error } = await supabase
-      .from("found_items")
-      .select("*")
-      .order("created_at", { ascending: false });
-      
-    if (error) throw error;
-    
-    // Transform the database results to include the type field
-    // Use type assertion to tell TypeScript that each item has the shape we expect
-    return (data || []).map(item => {
-      // First assert the item as unknown, then as our expected type
-      const foundItem = item as unknown as FoundItemDB;
-      return {
-        ...foundItem,
-        type: 'found' as const
-      };
-    });
-  };
-
-  // Use React Query to fetch data
+  // Use React Query to fetch data from our API service
   const { 
     data: lostItems = [], 
     isLoading: isLoadingLost 
