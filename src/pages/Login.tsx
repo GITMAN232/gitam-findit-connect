@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Google } from 'lucide-react';
+import { Mail as GoogleIcon } from 'lucide-react'; // Changed to Mail icon as a replacement since Google icon isn't available
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -250,7 +250,7 @@ const Login = () => {
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
                 >
-                  <Google className="mr-2 h-5 w-5 text-blue-500" />
+                  <GoogleIcon className="mr-2 h-5 w-5 text-blue-500" />
                   Google
                 </Button>
               </CardContent>
