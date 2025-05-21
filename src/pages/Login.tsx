@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { FcGoogle } from 'react-icons/fc';
+import { Google } from 'lucide-react';
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -250,7 +250,7 @@ const Login = () => {
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
                 >
-                  <FcGoogle className="mr-2 h-5 w-5" />
+                  <Google className="mr-2 h-5 w-5 text-blue-500" />
                   Google
                 </Button>
               </CardContent>
