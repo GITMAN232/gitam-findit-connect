@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-
 const formSchema = z.object({
   itemName: z.string().min(2, {
     message: "Item name must be at least 2 characters."
@@ -40,16 +38,17 @@ const formSchema = z.object({
   }),
   imageFile: z.instanceof(FileList).optional()
 });
-
 type FormValues = z.infer<typeof formSchema>;
-
 const ReportFound = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user } = useAuth();
+  const {
+    toast
+  } = useToast();
+  const {
+    user
+  } = useAuth();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,7 +59,6 @@ const ReportFound = () => {
       phone: ""
     }
   });
-
   const onSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true);
@@ -106,7 +104,6 @@ const ReportFound = () => {
       setIsSubmitting(false);
     }
   };
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -119,10 +116,7 @@ const ReportFound = () => {
   };
 
   // Helper component for required field indicator
-  const RequiredIndicator = () => (
-    <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />
-  );
-
+  const RequiredIndicator = () => <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />;
   return <div className="bg-white min-h-screen">
       <Navbar />
       <div className="pt-28 pb-20 bg-gradient-to-br from-white to-grey/30">
@@ -230,7 +224,7 @@ const ReportFound = () => {
                       <FormField control={form.control} name="phone" render={({
                       field
                     }) => <FormItem>
-                            <FormLabel className="text-lg flex items-center gap-2">
+                            <FormLabel className="text-lg flex items-center gap-2 (optional)\n">
                               <Phone className="w-4 h-4" />
                               Phone
                               <RequiredIndicator />
@@ -296,5 +290,4 @@ const ReportFound = () => {
       <Footer />
     </div>;
 };
-
 export default ReportFound;
