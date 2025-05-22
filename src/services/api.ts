@@ -100,25 +100,3 @@ export const fetchFoundItemById = async (id: number): Promise<FoundItem | null> 
   const item = mockFoundItems.find(item => item.id === id);
   return item || null;
 };
-
-/**
- * NOTE: These mock implementations can be replaced with actual Supabase queries
- * once the database tables are set up. Example implementation for reference:
- * 
- * export const fetchLostItems = async (): Promise<LostItem[]> => {
- *   const { data, error } = await supabase
- *     .from("lost_items")
- *     .select("*")
- *     .order("created_at", { ascending: false });
- *     
- *   if (error) throw error;
- *   
- *   return (data || []).map(item => {
- *     const lostItem = item as unknown as LostItemDB;
- *     return {
- *       ...lostItem,
- *       type: 'lost' as const
- *     };
- *   });
- * };
- */
