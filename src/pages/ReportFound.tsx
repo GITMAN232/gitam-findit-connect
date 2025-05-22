@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +11,8 @@ import { v4 as uuidv4 } from "uuid";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/contexts/AuthContext";
+import { uploadFile } from "@/utils/mockFileUpload";
+
 import {
   Form,
   FormControl,
@@ -81,28 +81,11 @@ const ReportFound = () => {
       // Upload image if provided
       if (values.imageFile && values.imageFile.length > 0) {
         const file = values.imageFile[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${uuidv4()}.${fileExt}`;
-        const filePath = `found-items/${fileName}`;
-        
-        const { error: uploadError, data } = await supabase.storage
-          .from('item-images')
-          .upload(filePath, file);
-          
-        if (uploadError) {
-          throw uploadError;
-        }
-        
-        // Get public URL
-        const { data: publicUrlData } = supabase.storage
-          .from('item-images')
-          .getPublicUrl(filePath);
-          
-        imageUrl = publicUrlData.publicUrl;
+        imageUrl = await uploadFile(file, 'found-items');
       }
       
-      // Insert record into database
-      const { error } = await supabase.from('found_items').insert({
+      // Mock submitting to database
+      console.log('Submitting found item report:', {
         user_id: user?.id,
         item_name: values.itemName,
         description: values.description,
@@ -114,9 +97,8 @@ const ReportFound = () => {
         status: 'active'
       });
       
-      if (error) {
-        throw error;
-      }
+      // Simulate successful submission
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       toast({
         title: "Report submitted",

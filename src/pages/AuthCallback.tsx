@@ -1,39 +1,22 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/contexts/AuthContext';
 
+// This is a mock implementation since we're not using Supabase right now
 const AuthCallback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleAuthCallback = async () => {
-      try {
-        // Process the OAuth callback
-        const { error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error handling auth callback:', error);
-          navigate('/login', { replace: true });
-        } else {
-          // Get the intended destination or default to home
-          const from = sessionStorage.getItem('authRedirect') || '/';
-          sessionStorage.removeItem('authRedirect');
-          navigate(from, { replace: true });
-        }
-      } catch (error) {
-        console.error('Error in auth callback:', error);
-        navigate('/login', { replace: true });
-      }
-    };
-
-    handleAuthCallback();
+    // Since we're not using real auth for now, just redirect to home
+    navigate('/', { replace: true });
   }, [navigate]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Processing authentication...</h2>
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-maroon"></div>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-2">Authenticating...</h2>
+        <p className="text-gray-500">Please wait while we complete the authentication process.</p>
+      </div>
     </div>
   );
 };
