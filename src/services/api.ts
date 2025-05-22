@@ -1,5 +1,5 @@
 
-import { supabase } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { ListingItem, LostItem, FoundItem, LostItemDB, FoundItemDB } from "@/types/ListingTypes";
 
 /**
