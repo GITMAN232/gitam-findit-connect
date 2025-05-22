@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const RecentItemsSection = () => {
   const recentItems = [
@@ -77,9 +78,11 @@ const RecentItemsSection = () => {
               Check out the latest lost and found items on campus
             </p>
           </div>
-          <button className="mt-4 md:mt-0 px-5 py-2 border-2 border-mustard text-mustard rounded-md hover:bg-mustard/10 font-medium transition-colors">
-            View All Items
-          </button>
+          <Link to="/listings">
+            <button className="mt-4 md:mt-0 px-5 py-2 border-2 border-mustard text-mustard rounded-md hover:bg-mustard/10 font-medium transition-colors">
+              View All Items
+            </button>
+          </Link>
         </div>
 
         <motion.div 
