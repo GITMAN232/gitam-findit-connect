@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, MapPin, Image } from "lucide-react";
+import { CalendarIcon, MapPin, Image, Mail, Phone, Star } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -45,8 +46,11 @@ const formSchema = z.object({
   lostDate: z.date({
     required_error: "Please select a date when the item was lost.",
   }),
-  contactInfo: z.string().min(5, {
-    message: "Contact information is required.",
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  phone: z.string().min(10, {
+    message: "Please enter a valid phone number.",
   }),
   imageFile: z.instanceof(FileList).optional(),
 });
@@ -66,7 +70,8 @@ const ReportLost = () => {
       itemName: "",
       description: "",
       location: "",
-      contactInfo: user?.email || "",
+      email: user?.email || "",
+      phone: "",
     },
   });
 
@@ -89,7 +94,8 @@ const ReportLost = () => {
         description: values.description,
         location: values.location,
         lost_date: values.lostDate.toISOString(),
-        contact_info: values.contactInfo,
+        email: values.email,
+        phone: values.phone,
         image_url: imageUrl,
         status: 'active'
       });
@@ -129,6 +135,11 @@ const ReportLost = () => {
     }
   };
 
+  // Helper component for required field indicator
+  const RequiredIndicator = () => (
+    <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />
+  );
+
   return (
     <div className="bg-white min-h-screen">
       <Navbar />
@@ -140,6 +151,10 @@ const ReportLost = () => {
             </h1>
             
             <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
+              <div className="mb-6 text-sm text-muted-foreground">
+                Fields marked with <Star className="h-3 w-3 text-red-500 inline mb-1" fill="currentColor" /> are required
+              </div>
+              
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -147,7 +162,10 @@ const ReportLost = () => {
                     name="itemName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-lg">Item Name</FormLabel>
+                        <FormLabel className="text-lg flex items-center">
+                          Item Name
+                          <RequiredIndicator />
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="e.g. Blue Laptop Bag" {...field} />
                         </FormControl>
@@ -161,7 +179,10 @@ const ReportLost = () => {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-lg">Description</FormLabel>
+                        <FormLabel className="text-lg flex items-center">
+                          Description
+                          <RequiredIndicator />
+                        </FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="Please describe your item in detail (color, brand, distinguishing features, etc.)" 
@@ -183,6 +204,7 @@ const ReportLost = () => {
                           <FormLabel className="text-lg flex items-center gap-2">
                             <MapPin className="w-4 h-4" />
                             Last Seen Location
+                            <RequiredIndicator />
                           </FormLabel>
                           <FormControl>
                             <Input placeholder="e.g. Library, Block-C" {...field} />
@@ -200,6 +222,7 @@ const ReportLost = () => {
                           <FormLabel className="text-lg flex items-center gap-2">
                             <CalendarIcon className="w-4 h-4" /> 
                             Date Lost
+                            <RequiredIndicator />
                           </FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
@@ -236,26 +259,60 @@ const ReportLost = () => {
                     />
                   </div>
 
-                  <FormField
-                    control={form.control}
-                    name="contactInfo"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-lg">Contact Information</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Phone number or email" 
-                            {...field} 
-                            defaultValue={user?.email || ""}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          This will be used to contact you if your item is found.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Contact Information Section */}
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <h3 className="text-lg font-medium mb-4">Contact Information</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Please provide your contact information so we can reach out to you if your item is found.
+                    </p>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-lg flex items-center gap-2">
+                              <Mail className="w-4 h-4" />
+                              Email
+                              <RequiredIndicator />
+                            </FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="your.email@example.com" 
+                                type="email"
+                                {...field} 
+                                defaultValue={user?.email || ""}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-lg flex items-center gap-2">
+                              <Phone className="w-4 h-4" />
+                              Phone
+                              <RequiredIndicator />
+                            </FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="+91 9876543210" 
+                                type="tel"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
 
                   <FormField
                     control={form.control}
@@ -305,6 +362,9 @@ const ReportLost = () => {
                             </label>
                           </div>
                         </FormControl>
+                        <FormDescription>
+                          While optional, adding an image helps others identify your item more easily.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, MapPin, Image, Mail, Phone } from "lucide-react";
+import { CalendarIcon, MapPin, Image, Mail, Phone, Star } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+
 const formSchema = z.object({
   itemName: z.string().min(2, {
     message: "Item name must be at least 2 characters."
@@ -33,20 +35,21 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address."
   }),
-  phone: z.string().optional(),
+  phone: z.string().min(10, {
+    message: "Please enter a valid phone number."
+  }),
   imageFile: z.instanceof(FileList).optional()
 });
+
 type FormValues = z.infer<typeof formSchema>;
+
 const ReportFound = () => {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    user
-  } = useAuth();
+  const { toast } = useToast();
+  const { user } = useAuth();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -57,6 +60,7 @@ const ReportFound = () => {
       phone: ""
     }
   });
+
   const onSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true);
@@ -76,7 +80,7 @@ const ReportFound = () => {
         location: values.location,
         found_date: values.foundDate.toISOString(),
         email: values.email,
-        phone: values.phone || null,
+        phone: values.phone,
         image_url: imageUrl,
         status: 'active'
       });
@@ -102,6 +106,7 @@ const ReportFound = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -112,6 +117,12 @@ const ReportFound = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  // Helper component for required field indicator
+  const RequiredIndicator = () => (
+    <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />
+  );
+
   return <div className="bg-white min-h-screen">
       <Navbar />
       <div className="pt-28 pb-20 bg-gradient-to-br from-white to-grey/30">
@@ -122,12 +133,19 @@ const ReportFound = () => {
             </h1>
             
             <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
+              <div className="mb-6 text-sm text-muted-foreground">
+                Fields marked with <Star className="h-3 w-3 text-red-500 inline mb-1" fill="currentColor" /> are required
+              </div>
+
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField control={form.control} name="itemName" render={({
                   field
                 }) => <FormItem>
-                        <FormLabel className="text-lg">Item Name</FormLabel>
+                        <FormLabel className="text-lg flex items-center">
+                          Item Name
+                          <RequiredIndicator />
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="e.g. Blue Laptop Bag" {...field} />
                         </FormControl>
@@ -137,7 +155,10 @@ const ReportFound = () => {
                   <FormField control={form.control} name="description" render={({
                   field
                 }) => <FormItem>
-                        <FormLabel className="text-lg">Description</FormLabel>
+                        <FormLabel className="text-lg flex items-center">
+                          Description
+                          <RequiredIndicator />
+                        </FormLabel>
                         <FormControl>
                           <Textarea placeholder="Please describe the item in detail (color, brand, distinguishing features, etc.)" className="min-h-[120px]" {...field} />
                         </FormControl>
@@ -151,6 +172,7 @@ const ReportFound = () => {
                           <FormLabel className="text-lg flex items-center gap-2">
                             <MapPin className="w-4 h-4" />
                             Where Found
+                            <RequiredIndicator />
                           </FormLabel>
                           <FormControl>
                             <Input placeholder="e.g. Library, Block-C" {...field} />
@@ -164,6 +186,7 @@ const ReportFound = () => {
                           <FormLabel className="text-lg flex items-center gap-2">
                             <CalendarIcon className="w-4 h-4" /> 
                             Date Found
+                            <RequiredIndicator />
                           </FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
@@ -196,6 +219,7 @@ const ReportFound = () => {
                             <FormLabel className="text-lg flex items-center gap-2">
                               <Mail className="w-4 h-4" />
                               Email
+                              <RequiredIndicator />
                             </FormLabel>
                             <FormControl>
                               <Input placeholder="your.email@example.com" type="email" {...field} defaultValue={user?.email || ""} />
@@ -208,7 +232,8 @@ const ReportFound = () => {
                     }) => <FormItem>
                             <FormLabel className="text-lg flex items-center gap-2">
                               <Phone className="w-4 h-4" />
-                              Phone (Optional)
+                              Phone
+                              <RequiredIndicator />
                             </FormLabel>
                             <FormControl>
                               <Input placeholder="+91 9876543210" type="tel" {...field} />
@@ -251,6 +276,9 @@ const ReportFound = () => {
                             </label>
                           </div>
                         </FormControl>
+                        <FormDescription>
+                          While optional, adding an image helps others identify their lost item more easily.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>} />
 
@@ -268,4 +296,5 @@ const ReportFound = () => {
       <Footer />
     </div>;
 };
+
 export default ReportFound;
