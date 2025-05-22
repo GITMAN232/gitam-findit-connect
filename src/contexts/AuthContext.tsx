@@ -6,6 +6,9 @@ import { Navigate, useLocation } from 'react-router-dom';
 type User = {
   id: string;
   email: string;
+  user_metadata?: {
+    avatar_url?: string;
+  };
 };
 
 type AuthContextType = {
@@ -29,6 +32,9 @@ type AuthProviderProps = {
 const mockUser = {
   id: 'mock-user-id',
   email: 'user@example.com',
+  user_metadata: {
+    avatar_url: undefined
+  }
 };
 
 export function AuthProvider({ children }: AuthProviderProps) {
