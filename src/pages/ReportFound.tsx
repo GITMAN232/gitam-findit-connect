@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+
 const formSchema = z.object({
   itemName: z.string().min(2, {
     message: "Item name must be at least 2 characters."
@@ -33,12 +34,12 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address."
   }),
-  phone: z.string().min(10, {
-    message: "Please enter a valid phone number."
-  }),
+  phone: z.string().optional(),
   imageFile: z.instanceof(FileList).optional()
 });
+
 type FormValues = z.infer<typeof formSchema>;
+
 const ReportFound = () => {
   const navigate = useNavigate();
   const {
@@ -56,7 +57,7 @@ const ReportFound = () => {
       description: "",
       location: "",
       email: user?.email || "",
-      phone: ""
+      phone: "123456789" // Default placeholder phone number
     }
   });
   const onSubmit = async (values: FormValues) => {
@@ -117,6 +118,7 @@ const ReportFound = () => {
 
   // Helper component for required field indicator
   const RequiredIndicator = () => <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />;
+  
   return <div className="bg-white min-h-screen">
       <Navbar />
       <div className="pt-28 pb-20 bg-gradient-to-br from-white to-grey/30">
@@ -169,7 +171,10 @@ const ReportFound = () => {
                             <RequiredIndicator />
                           </FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g. Library, Block-C" {...field} />
+                            <div className="relative">
+                              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+                              <Input className="pl-10" placeholder="e.g. Library, Block-C" {...field} />
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>} />
@@ -216,7 +221,7 @@ const ReportFound = () => {
                               <RequiredIndicator />
                             </FormLabel>
                             <FormControl>
-                              <Input placeholder="your.email@example.com" type="email" {...field} defaultValue={user?.email || ""} />
+                              <Input placeholder="your.email@example.com" type="email" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>} />
@@ -224,16 +229,15 @@ const ReportFound = () => {
                       <FormField control={form.control} name="phone" render={({
                       field
                     }) => <FormItem>
-                            <FormLabel className="text-lg flex items-center gap-2 (optional)\n">
+                            <FormLabel className="text-lg flex items-center gap-2">
                               <Phone className="w-4 h-4" />
-                              Phone
-                              <RequiredIndicator />
+                              Phone (Optional)
                             </FormLabel>
                             <FormControl>
-                              <Input placeholder="+91 9876543210" type="tel" {...field} />
+                              <Input placeholder="123456789" type="tel" {...field} />
                             </FormControl>
+                            <FormDescription>Optional contact number for quicker communication</FormDescription>
                             <FormMessage />
-                            <FormDescription>Contact info is only visible to admins or when needed for verified matches.</FormDescription>
                           </FormItem>} />
                     </div>
                   </div>
@@ -290,4 +294,5 @@ const ReportFound = () => {
       <Footer />
     </div>;
 };
+
 export default ReportFound;

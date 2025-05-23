@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,9 +48,7 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-  phone: z.string().min(10, {
-    message: "Please enter a valid phone number.",
-  }),
+  phone: z.string().optional(),
   imageFile: z.instanceof(FileList).optional(),
 });
 
@@ -71,7 +68,7 @@ const ReportLost = () => {
       description: "",
       location: "",
       email: user?.email || "",
-      phone: "",
+      phone: "123456789", // Default placeholder phone number
     },
   });
 
@@ -207,7 +204,10 @@ const ReportLost = () => {
                             <RequiredIndicator />
                           </FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g. Library, Block-C" {...field} />
+                            <div className="relative">
+                              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+                              <Input className="pl-10" placeholder="e.g. Library, Block-C" {...field} />
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -281,8 +281,7 @@ const ReportLost = () => {
                               <Input 
                                 placeholder="your.email@example.com" 
                                 type="email"
-                                {...field} 
-                                defaultValue={user?.email || ""}
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -297,16 +296,18 @@ const ReportLost = () => {
                           <FormItem>
                             <FormLabel className="text-lg flex items-center gap-2">
                               <Phone className="w-4 h-4" />
-                              Phone
-                              <RequiredIndicator />
+                              Phone (Optional)
                             </FormLabel>
                             <FormControl>
                               <Input 
-                                placeholder="+91 9876543210" 
+                                placeholder="123456789" 
                                 type="tel"
                                 {...field} 
                               />
                             </FormControl>
+                            <FormDescription>
+                              Optional contact number for quicker communication
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
