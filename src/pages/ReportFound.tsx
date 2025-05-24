@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-
 const formSchema = z.object({
   itemName: z.string().min(2, {
     message: "Item name must be at least 2 characters."
@@ -37,9 +36,7 @@ const formSchema = z.object({
   phone: z.string().optional(),
   imageFile: z.instanceof(FileList).optional()
 });
-
 type FormValues = z.infer<typeof formSchema>;
-
 const ReportFound = () => {
   const navigate = useNavigate();
   const {
@@ -118,7 +115,6 @@ const ReportFound = () => {
 
   // Helper component for required field indicator
   const RequiredIndicator = () => <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />;
-  
   return <div className="bg-white min-h-screen">
       <Navbar />
       <div className="pt-28 pb-20 bg-gradient-to-br from-white to-grey/30">
@@ -274,9 +270,7 @@ const ReportFound = () => {
                             </label>
                           </div>
                         </FormControl>
-                        <FormDescription>
-                          Adding an image helps others recognize the item more easily.
-                        </FormDescription>
+                        <FormDescription>Adding an image helps others recognize the object more easily.</FormDescription>
                         <FormMessage />
                       </FormItem>} />
 
@@ -294,5 +288,4 @@ const ReportFound = () => {
       <Footer />
     </div>;
 };
-
 export default ReportFound;
