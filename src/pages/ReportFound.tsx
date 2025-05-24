@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -168,7 +167,7 @@ const ReportFound = () => {
                   }) => <FormItem>
                           <FormLabel className="text-lg flex items-center gap-2">
                             <MapPin className="w-4 h-4" />
-                            Last at
+                            Found at
                             <RequiredIndicator />
                           </FormLabel>
                           <FormControl>
