@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,9 +18,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+
 const formSchema = z.object({
-  itemName: z.string().min(2, {
-    message: "Item name must be at least 2 characters."
+  objectName: z.string().min(2, {
+    message: "Object name must be at least 2 characters."
   }),
   description: z.string().min(10, {
     message: "Description must be at least 10 characters."
@@ -28,7 +30,7 @@ const formSchema = z.object({
     message: "Location is required."
   }),
   foundDate: z.date({
-    required_error: "Please select a date when you found the item."
+    required_error: "Please select a date when you found the object."
   }),
   email: z.string().email({
     message: "Please enter a valid email address."
@@ -36,27 +38,27 @@ const formSchema = z.object({
   phone: z.string().optional(),
   imageFile: z.instanceof(FileList).optional()
 });
+
 type FormValues = z.infer<typeof formSchema>;
+
 const ReportFound = () => {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    user
-  } = useAuth();
+  const { toast } = useToast();
+  const { user } = useAuth();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      itemName: "",
+      objectName: "",
       description: "",
       location: "",
       email: user?.email || "",
-      phone: "" // Changed to empty string instead of placeholder number
+      phone: ""
     }
   });
+
   const onSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true);
@@ -65,13 +67,13 @@ const ReportFound = () => {
       // Upload image if provided
       if (values.imageFile && values.imageFile.length > 0) {
         const file = values.imageFile[0];
-        imageUrl = await uploadFile(file, 'found-items');
+        imageUrl = await uploadFile(file, 'found-objects');
       }
 
       // Mock submitting to database
-      console.log('Submitting found item report:', {
+      console.log('Submitting found object report:', {
         user_id: user?.id,
-        item_name: values.itemName,
+        object_name: values.objectName,
         description: values.description,
         location: values.location,
         found_date: values.foundDate.toISOString(),
@@ -85,7 +87,7 @@ const ReportFound = () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       toast({
         title: "Report submitted",
-        description: "Your found item report has been submitted successfully."
+        description: "Your found object report has been submitted successfully."
       });
 
       // Redirect back to listings page after a short delay
@@ -102,6 +104,7 @@ const ReportFound = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -115,13 +118,14 @@ const ReportFound = () => {
 
   // Helper component for required field indicator
   const RequiredIndicator = () => <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />;
+  
   return <div className="bg-white min-h-screen">
       <Navbar />
       <div className="pt-28 pb-20 bg-gradient-to-br from-white to-grey/30">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-mustard mb-8">
-              Report a Found Item
+              Report a Found Object
             </h1>
             
             <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
@@ -131,11 +135,11 @@ const ReportFound = () => {
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField control={form.control} name="itemName" render={({
+                  <FormField control={form.control} name="objectName" render={({
                   field
                 }) => <FormItem>
                         <FormLabel className="text-lg flex items-center">
-                          Item Name
+                          Object Name
                           <RequiredIndicator />
                         </FormLabel>
                         <FormControl>
@@ -152,7 +156,7 @@ const ReportFound = () => {
                           <RequiredIndicator />
                         </FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Please describe the item in detail (color, brand, distinguishing features, etc.)" className="min-h-[120px]" {...field} />
+                          <Textarea placeholder="Please describe the object in detail (color, brand, distinguishing features, etc.)" className="min-h-[120px]" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>} />
@@ -204,7 +208,7 @@ const ReportFound = () => {
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <h3 className="text-lg font-medium mb-4">Contact Information</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Please provide your contact information so we can reach out to you if someone claims this item.
+                      Please provide your contact information so we can reach out to you if someone claims this object.
                     </p>
                     
                     <div className="grid md:grid-cols-2 gap-6">
@@ -263,12 +267,16 @@ const ReportFound = () => {
                                   </p>
                                 </div> : <>
                                   <Image className="h-10 w-10 text-muted-foreground mb-2" />
-                                  <p className="text-sm text-center text-muted-foreground">Click to upload an image of the found object</p>
+                                  <p className="text-sm text-center text-muted-foreground">
+                                    Click to upload an image of the found object
+                                  </p>
                                 </>}
                             </label>
                           </div>
                         </FormControl>
-                        <FormDescription>Adding an image helps others recognize the object more easily.</FormDescription>
+                        <FormDescription>
+                          Adding an image helps others recognize the object more easily.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>} />
 
@@ -286,4 +294,5 @@ const ReportFound = () => {
       <Footer />
     </div>;
 };
+
 export default ReportFound;

@@ -17,9 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+
 const formSchema = z.object({
-  itemName: z.string().min(2, {
-    message: "Item name must be at least 2 characters."
+  objectName: z.string().min(2, {
+    message: "Object name must be at least 2 characters."
   }),
   description: z.string().min(10, {
     message: "Description must be at least 10 characters."
@@ -28,7 +29,7 @@ const formSchema = z.object({
     message: "Location is required."
   }),
   lostDate: z.date({
-    required_error: "Please select a date when the item was lost."
+    required_error: "Please select a date when the object was lost."
   }),
   email: z.string().email({
     message: "Please enter a valid email address."
@@ -36,27 +37,27 @@ const formSchema = z.object({
   phone: z.string().optional(),
   imageFile: z.instanceof(FileList).optional()
 });
+
 type FormValues = z.infer<typeof formSchema>;
+
 const ReportLost = () => {
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    user
-  } = useAuth();
+  const { toast } = useToast();
+  const { user } = useAuth();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      itemName: "",
+      objectName: "",
       description: "",
       location: "",
       email: user?.email || "",
-      phone: "" // Changed to empty string instead of placeholder number
+      phone: ""
     }
   });
+
   const onSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true);
@@ -65,13 +66,13 @@ const ReportLost = () => {
       // Upload image if provided
       if (values.imageFile && values.imageFile.length > 0) {
         const file = values.imageFile[0];
-        imageUrl = await uploadFile(file, 'lost-items');
+        imageUrl = await uploadFile(file, 'lost-objects');
       }
 
       // Mock submitting to database
-      console.log('Submitting lost item report:', {
+      console.log('Submitting lost object report:', {
         user_id: user?.id,
-        item_name: values.itemName,
+        object_name: values.objectName,
         description: values.description,
         location: values.location,
         lost_date: values.lostDate.toISOString(),
@@ -85,7 +86,7 @@ const ReportLost = () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       toast({
         title: "Report submitted",
-        description: "Your lost item report has been submitted successfully."
+        description: "Your lost object report has been submitted successfully."
       });
 
       // Redirect back to listings page after a short delay
@@ -102,6 +103,7 @@ const ReportLost = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -115,13 +117,14 @@ const ReportLost = () => {
 
   // Helper component for required field indicator
   const RequiredIndicator = () => <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />;
+  
   return <div className="bg-white min-h-screen">
       <Navbar />
       <div className="pt-28 pb-20 bg-gradient-to-br from-white to-grey/30">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-maroon mb-8">
-              Report a Lost Item
+              Report a Lost Object
             </h1>
             
             <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
@@ -131,11 +134,11 @@ const ReportLost = () => {
               
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField control={form.control} name="itemName" render={({
+                  <FormField control={form.control} name="objectName" render={({
                   field
                 }) => <FormItem>
                         <FormLabel className="text-lg flex items-center">
-                          Item Name
+                          Object Name
                           <RequiredIndicator />
                         </FormLabel>
                         <FormControl>
@@ -152,7 +155,7 @@ const ReportLost = () => {
                           <RequiredIndicator />
                         </FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Please describe your item in detail (color, brand, distinguishing features, etc.)" className="min-h-[120px]" {...field} />
+                          <Textarea placeholder="Please describe your object in detail (color, brand, distinguishing features, etc.)" className="min-h-[120px]" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>} />
@@ -204,7 +207,7 @@ const ReportLost = () => {
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <h3 className="text-lg font-medium mb-4">Contact Information</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Please provide your contact information so we can reach out to you if your item is found.
+                      Please provide your contact information so we can reach out to you if your object is found.
                     </p>
                     
                     <div className="grid md:grid-cols-2 gap-6">
@@ -288,4 +291,5 @@ const ReportLost = () => {
       <Footer />
     </div>;
 };
+
 export default ReportLost;

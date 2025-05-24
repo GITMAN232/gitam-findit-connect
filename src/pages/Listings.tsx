@@ -34,10 +34,10 @@ const Listings = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-maroon mb-2">
-                Lost & Found Items
+                Lost & Found Objects
               </h1>
               <p className="text-gray-600">
-                Browse through all reported lost and found items on campus
+                Browse through all reported lost and found objects on campus
               </p>
             </div>
             <div className="mt-4 md:mt-0 flex gap-2">
@@ -46,14 +46,14 @@ const Listings = () => {
                 className="bg-maroon/10 hover:bg-maroon/20 text-maroon border-maroon"
                 onClick={() => window.location.href="/report-lost"}
               >
-                Report Lost Item
+                Report Lost Object
               </Button>
               <Button 
                 variant="outline" 
                 className="bg-mustard/10 hover:bg-mustard/20 text-mustard border-mustard"
                 onClick={() => window.location.href="/report-found"}
               >
-                Report Found Item
+                Report Found Object
               </Button>
             </div>
           </div>
@@ -78,11 +78,11 @@ const Listings = () => {
                 <EmptyState searchQuery={searchQuery} category={category} />
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                  {paginatedItems.map((item) => (
+                  {paginatedItems.map((object) => (
                     <ListingCard
-                      key={`${item.type}-${item.id}`}
-                      item={item}
-                      onClick={() => setSelectedItem(item)}
+                      key={`${object.type}-${object.id}`}
+                      item={object}
+                      onClick={() => setSelectedItem(object)}
                     />
                   ))}
                 </div>
@@ -100,7 +100,7 @@ const Listings = () => {
         </div>
       </div>
 
-      {/* Item Detail Dialog */}
+      {/* Object Detail Dialog */}
       <ListingDetail
         selectedItem={selectedItem}
         onOpenChange={(open) => !open && setSelectedItem(null)}

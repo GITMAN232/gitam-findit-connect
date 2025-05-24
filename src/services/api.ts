@@ -1,8 +1,7 @@
+import { ListingObject, LostObject, FoundObject, LostObjectDB, FoundObjectDB } from "@/types/ListingTypes";
 
-import { ListingItem, LostItem, FoundItem, LostItemDB, FoundItemDB } from "@/types/ListingTypes";
-
-// Mock data for lost items
-const mockLostItems: LostItem[] = [
+// Mock data for lost objects
+const mockLostObjects: LostObject[] = [
   {
     id: 1,
     created_at: "2025-04-10T15:30:00Z",
@@ -31,8 +30,8 @@ const mockLostItems: LostItem[] = [
   }
 ];
 
-// Mock data for found items
-const mockFoundItems: FoundItem[] = [
+// Mock data for found objects
+const mockFoundObjects: FoundObject[] = [
   {
     id: 1,
     created_at: "2025-04-11T09:20:00Z",
@@ -64,39 +63,45 @@ const mockFoundItems: FoundItem[] = [
 ];
 
 /**
- * Fetch all lost items (mock implementation)
+ * Fetch all lost objects (mock implementation)
  */
-export const fetchLostItems = async (): Promise<LostItem[]> => {
+export const fetchLostObjects = async (): Promise<LostObject[]> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  return mockLostItems;
+  return mockLostObjects;
 };
 
 /**
- * Fetch all found items (mock implementation)
+ * Fetch all found objects (mock implementation)
  */
-export const fetchFoundItems = async (): Promise<FoundItem[]> => {
+export const fetchFoundObjects = async (): Promise<FoundObject[]> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  return mockFoundItems;
+  return mockFoundObjects;
 };
 
 /**
- * Fetch a specific lost item by ID (mock implementation)
+ * Fetch a specific lost object by ID (mock implementation)
  */
-export const fetchLostItemById = async (id: number): Promise<LostItem | null> => {
+export const fetchLostObjectById = async (id: number): Promise<LostObject | null> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 300));
-  const item = mockLostItems.find(item => item.id === id);
-  return item || null;
+  const object = mockLostObjects.find(object => object.id === id);
+  return object || null;
 };
 
 /**
- * Fetch a specific found item by ID (mock implementation)
+ * Fetch a specific found object by ID (mock implementation)
  */
-export const fetchFoundItemById = async (id: number): Promise<FoundItem | null> => {
+export const fetchFoundObjectById = async (id: number): Promise<FoundObject | null> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 300));
-  const item = mockFoundItems.find(item => item.id === id);
-  return item || null;
+  const object = mockFoundObjects.find(object => object.id === id);
+  return object || null;
 };
+
+// Keep the old function names for backward compatibility
+export const fetchLostItems = fetchLostObjects;
+export const fetchFoundItems = fetchFoundObjects;
+export const fetchLostItemById = fetchLostObjectById;
+export const fetchFoundItemById = fetchFoundObjectById;
