@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -68,7 +69,7 @@ const ReportLost = () => {
       description: "",
       location: "",
       email: user?.email || "",
-      phone: "123456789", // Default placeholder phone number
+      phone: "", // Changed to empty string instead of placeholder number
     },
   });
 
@@ -200,7 +201,7 @@ const ReportLost = () => {
                         <FormItem>
                           <FormLabel className="text-lg flex items-center gap-2">
                             <MapPin className="w-4 h-4" />
-                            Last Seen Location
+                            Last at
                             <RequiredIndicator />
                           </FormLabel>
                           <FormControl>
@@ -221,7 +222,7 @@ const ReportLost = () => {
                         <FormItem className="flex flex-col">
                           <FormLabel className="text-lg flex items-center gap-2">
                             <CalendarIcon className="w-4 h-4" /> 
-                            Date Lost
+                            Last on
                             <RequiredIndicator />
                           </FormLabel>
                           <Popover>
@@ -279,7 +280,7 @@ const ReportLost = () => {
                             </FormLabel>
                             <FormControl>
                               <Input 
-                                placeholder="your.email@example.com" 
+                                placeholder="e.g., student@gitam.edu" 
                                 type="email"
                                 {...field}
                               />
@@ -300,7 +301,7 @@ const ReportLost = () => {
                             </FormLabel>
                             <FormControl>
                               <Input 
-                                placeholder="123456789" 
+                                placeholder="e.g., +91 9876543210" 
                                 type="tel"
                                 {...field} 
                               />
@@ -364,7 +365,7 @@ const ReportLost = () => {
                           </div>
                         </FormControl>
                         <FormDescription>
-                          While optional, adding an image helps others identify your item more easily.
+                          Adding an image helps others recognize the item more easily.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
