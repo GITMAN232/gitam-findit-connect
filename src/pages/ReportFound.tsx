@@ -263,9 +263,7 @@ const ReportFound = () => {
                                   </p>
                                 </div> : <>
                                   <Image className="h-10 w-10 text-muted-foreground mb-2" />
-                                  <p className="text-sm text-center text-muted-foreground">
-                                    Click to upload an image of the found item
-                                  </p>
+                                  <p className="text-sm text-center text-muted-foreground">Click to upload an image of the found object</p>
                                 </>}
                             </label>
                           </div>
