@@ -1,14 +1,14 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ListingItem } from "@/types/ListingTypes";
+import { ListingObject } from "@/types/ListingTypes";
 import { fetchLostItems, fetchFoundItems } from "@/services/api";
 
 export const PAGE_SIZE = 8;
 
 export const useListings = (searchQuery: string, category: string, activeTab: string) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedItem, setSelectedItem] = useState<ListingItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<ListingObject | null>(null);
 
   // Use React Query to fetch data from our API service
   const { 
@@ -31,7 +31,7 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
 
   // Filter and paginate items
   const filteredItems = useMemo(() => {
-    let items: ListingItem[] = [];
+    let items: ListingObject[] = [];
     
     // Apply tab filter first
     if (activeTab === "all" || activeTab === "lost") {

@@ -1,19 +1,18 @@
-
 import React from "react";
 import { format } from "date-fns";
 import { MapPin, Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { ListingItem } from "@/types/ListingTypes";
+import { ListingObject } from "@/types/ListingTypes";
 
 interface ListingCardProps {
-  item: ListingItem;
+  item: ListingObject;
   onClick: () => void;
 }
 
 const ListingCard = ({ item, onClick }: ListingCardProps) => {
   // Render date based on item type
-  const renderDate = (item: ListingItem) => {
+  const renderDate = (item: ListingObject) => {
     if (item.type === 'lost') {
       return format(new Date(item.lost_date), "PPP");
     } else {

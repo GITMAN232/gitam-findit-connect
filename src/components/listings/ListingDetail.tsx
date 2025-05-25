@@ -1,4 +1,3 @@
-
 import React from "react";
 import { format } from "date-fns";
 import { MapPin, Calendar, Clock, Mail, Phone } from "lucide-react";
@@ -9,10 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ListingItem } from "@/types/ListingTypes";
+import { ListingObject } from "@/types/ListingTypes";
 
 interface ListingDetailProps {
-  selectedItem: ListingItem | null;
+  selectedItem: ListingObject | null;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -20,7 +19,7 @@ const ListingDetail = ({ selectedItem, onOpenChange }: ListingDetailProps) => {
   if (!selectedItem) return null;
 
   // Render date based on item type
-  const renderDate = (item: ListingItem) => {
+  const renderDate = (item: ListingObject) => {
     if (item.type === 'lost') {
       return format(new Date(item.lost_date), "PPP");
     } else {
@@ -137,7 +136,7 @@ const ListingDetail = ({ selectedItem, onOpenChange }: ListingDetailProps) => {
             
             <div className="border-t pt-4">
               <p className="text-sm text-gray-500">
-                Please contact the reporter if you have information about this item.
+                Please contact the reporter if you have information about this object.
                 Be prepared to provide identifying details to verify ownership.
               </p>
             </div>
