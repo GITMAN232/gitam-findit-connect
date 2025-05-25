@@ -24,6 +24,93 @@ export type Database = {
         }
         Relationships: []
       }
+      found_objects: {
+        Row: {
+          created_at: string
+          description: string
+          email: string
+          found_date: string
+          id: string
+          image_url: string | null
+          location: string
+          object_name: string
+          phone: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          email: string
+          found_date: string
+          id?: string
+          image_url?: string | null
+          location: string
+          object_name: string
+          phone?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          email?: string
+          found_date?: string
+          id?: string
+          image_url?: string | null
+          location?: string
+          object_name?: string
+          phone?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lost_objects: {
+        Row: {
+          contact_info: string
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          location: string
+          lost_date: string
+          object_name: string
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_info: string
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          location: string
+          lost_date: string
+          object_name: string
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_info?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          location?: string
+          lost_date?: string
+          object_name?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

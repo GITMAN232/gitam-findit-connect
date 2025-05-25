@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,11 +7,10 @@ import { CalendarIcon, MapPin, Image, Mail, Phone, Star } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { v4 as uuidv4 } from "uuid";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { uploadFile } from "@/utils/mockFileUpload";
+import { createLostObject, uploadImage } from "@/services/supabaseApi";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -66,33 +66,25 @@ const ReportLost = () => {
       // Upload image if provided
       if (values.imageFile && values.imageFile.length > 0) {
         const file = values.imageFile[0];
-        imageUrl = await uploadFile(file, 'lost-objects');
+        imageUrl = await uploadImage(file);
       }
 
-      // Mock submitting to database
-      console.log('Submitting lost object report:', {
-        user_id: user?.id,
+      // Submit to Supabase
+      await createLostObject({
         object_name: values.objectName,
         description: values.description,
         location: values.location,
-        lost_date: values.lostDate.toISOString(),
-        email: values.email,
-        phone: values.phone,
+        lost_date: values.lostDate.toISOString().split('T')[0],
+        contact_info: values.email,
         image_url: imageUrl,
-        status: 'active'
       });
 
-      // Simulate successful submission
-      await new Promise(resolve => setTimeout(resolve, 500));
       toast({
         title: "Report submitted",
         description: "Your lost object report has been submitted successfully."
       });
 
-      // Redirect back to listings page after a short delay
-      setTimeout(() => {
-        navigate("/listings");
-      }, 2000);
+      navigate("/listings");
     } catch (error: any) {
       toast({
         title: "Error submitting report",
@@ -115,10 +107,10 @@ const ReportLost = () => {
     }
   };
 
-  // Helper component for required field indicator
   const RequiredIndicator = () => <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />;
   
-  return <div className="bg-white min-h-screen">
+  return (
+    <div className="bg-white min-h-screen">
       <Navbar />
       <div className="pt-28 pb-20 bg-gradient-to-br from-white to-grey/30">
         <div className="container mx-auto px-4">
@@ -134,73 +126,73 @@ const ReportLost = () => {
               
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField control={form.control} name="objectName" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel className="text-lg flex items-center">
-                          Object Name
-                          <RequiredIndicator />
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g. Blue Laptop Bag" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>} />
+                  <FormField control={form.control} name="objectName" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg flex items-center">
+                        Object Name
+                        <RequiredIndicator />
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. Blue Laptop Bag" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
                   
-                  <FormField control={form.control} name="description" render={({
-                  field
-                }) => <FormItem>
-                        <FormLabel className="text-lg flex items-center">
-                          Description
-                          <RequiredIndicator />
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Please describe your object in detail (color, brand, distinguishing features, etc.)" className="min-h-[120px]" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>} />
+                  <FormField control={form.control} name="description" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg flex items-center">
+                        Description
+                        <RequiredIndicator />
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Please describe your object in detail (color, brand, distinguishing features, etc.)" className="min-h-[120px]" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
 
                   <div className="grid md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="location" render={({
-                    field
-                  }) => <FormItem>
-                          <FormLabel className="text-lg flex items-center gap-2">
-                            <MapPin className="w-4 h-4" />
-                            Last at
-                            <RequiredIndicator />
-                          </FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-                              <Input className="pl-10" placeholder="e.g. Library, Block-C" {...field} />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>} />
+                    <FormField control={form.control} name="location" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-lg flex items-center gap-2">
+                          <MapPin className="w-4 h-4" />
+                          Last at
+                          <RequiredIndicator />
+                        </FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+                            <Input className="pl-10" placeholder="e.g. Library, Block-C" {...field} />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                     
-                    <FormField control={form.control} name="lostDate" render={({
-                    field
-                  }) => <FormItem className="flex flex-col">
-                          <FormLabel className="text-lg flex items-center gap-2">
-                            <CalendarIcon className="w-4 h-4" /> 
-                            Last on
-                            <RequiredIndicator />
-                          </FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button variant={"outline"} className={`w-full pl-3 text-left font-normal ${!field.value ? "text-muted-foreground" : ""}`}>
-                                  {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={date => date > new Date() || date < new Date("1900-01-01")} />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>} />
+                    <FormField control={form.control} name="lostDate" render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel className="text-lg flex items-center gap-2">
+                          <CalendarIcon className="w-4 h-4" /> 
+                          Last on
+                          <RequiredIndicator />
+                        </FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button variant={"outline"} className={`w-full pl-3 text-left font-normal ${!field.value ? "text-muted-foreground" : ""}`}>
+                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={date => date > new Date() || date < new Date("1900-01-01")} />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                   </div>
 
                   {/* Contact Information Section */}
@@ -211,71 +203,71 @@ const ReportLost = () => {
                     </p>
                     
                     <div className="grid md:grid-cols-2 gap-6">
-                      <FormField control={form.control} name="email" render={({
-                      field
-                    }) => <FormItem>
-                            <FormLabel className="text-lg flex items-center gap-2">
-                              <Mail className="w-4 h-4" />
-                              Email
-                              <RequiredIndicator />
-                            </FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., student@gitam.edu" type="email" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>} />
+                      <FormField control={form.control} name="email" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-lg flex items-center gap-2">
+                            <Mail className="w-4 h-4" />
+                            Email
+                            <RequiredIndicator />
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., student@gitam.edu" type="email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
                       
-                      <FormField control={form.control} name="phone" render={({
-                      field
-                    }) => <FormItem>
-                            <FormLabel className="text-lg flex items-center gap-2">
-                              <Phone className="w-4 h-4" />
-                              Phone (Optional)
-                            </FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., +91 9876543210" type="tel" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                              Optional contact number for quicker communication
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>} />
+                      <FormField control={form.control} name="phone" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-lg flex items-center gap-2">
+                            <Phone className="w-4 h-4" />
+                            Phone (Optional)
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., +91 9876543210" type="tel" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            Optional contact number for quicker communication
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
                     </div>
                   </div>
 
-                  <FormField control={form.control} name="imageFile" render={({
-                  field: {
-                    value,
-                    onChange,
-                    ...fieldProps
-                  }
-                }) => <FormItem>
-                        <FormLabel className="text-lg flex items-center gap-2">
-                          <Image className="w-4 h-4" />
-                          Upload Image (Optional)
-                        </FormLabel>
-                        <FormControl>
-                          <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 transition-colors hover:border-primary/50">
-                            <Input type="file" accept="image/*" className="hidden" id="image-upload" onChange={e => {
-                        handleImageChange(e);
-                        onChange(e.target.files);
-                      }} {...fieldProps} />
-                            <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center justify-center w-full">
-                              {imagePreview ? <div className="relative w-full">
-                                  <img src={imagePreview} alt="Preview" className="mx-auto max-h-48 object-contain rounded-md" />
-                                  <p className="text-sm text-center mt-2 text-muted-foreground">
-                                    Click to change image
-                                  </p>
-                                </div> : <>
-                                  <Image className="h-10 w-10 text-muted-foreground mb-2" />
-                                  <p className="text-sm text-center text-muted-foreground">Click to upload an image of your lost object</p>
-                                </>}
-                            </label>
-                          </div>
-                        </FormControl>
-                        <FormDescription>Adding an image helps others recognize the object more easily.</FormDescription>
-                        <FormMessage />
-                      </FormItem>} />
+                  <FormField control={form.control} name="imageFile" render={({ field: { value, onChange, ...fieldProps } }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg flex items-center gap-2">
+                        <Image className="w-4 h-4" />
+                        Upload Image (Optional)
+                      </FormLabel>
+                      <FormControl>
+                        <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 transition-colors hover:border-primary/50">
+                          <Input type="file" accept="image/*" className="hidden" id="image-upload" onChange={e => {
+                            handleImageChange(e);
+                            onChange(e.target.files);
+                          }} {...fieldProps} />
+                          <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center justify-center w-full">
+                            {imagePreview ? (
+                              <div className="relative w-full">
+                                <img src={imagePreview} alt="Preview" className="mx-auto max-h-48 object-contain rounded-md" />
+                                <p className="text-sm text-center mt-2 text-muted-foreground">
+                                  Click to change image
+                                </p>
+                              </div>
+                            ) : (
+                              <>
+                                <Image className="h-10 w-10 text-muted-foreground mb-2" />
+                                <p className="text-sm text-center text-muted-foreground">Click to upload an image of your lost object</p>
+                              </>
+                            )}
+                          </label>
+                        </div>
+                      </FormControl>
+                      <FormDescription>Adding an image helps others recognize the object more easily.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
 
                   <div className="pt-4">
                     <Button type="submit" className="w-full md:w-auto bg-maroon hover:bg-maroon/90 text-white" size="lg" disabled={isSubmitting}>
@@ -289,7 +281,8 @@ const ReportLost = () => {
         </div>
       </div>
       <Footer />
-    </div>;
+    </div>
+  );
 };
 
 export default ReportLost;

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { format } from "date-fns";
 import { MapPin, Calendar, Clock } from "lucide-react";
@@ -38,7 +39,7 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
         {item.image_url ? (
           <img
             src={item.image_url}
-            alt={item.item_name}
+            alt={item.object_name}
             className="w-full h-full object-cover"
           />
         ) : (
@@ -50,7 +51,7 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
         )}
       </div>
       <CardContent className="p-4">
-        <h3 className="text-lg font-semibold line-clamp-1">{item.item_name}</h3>
+        <h3 className="text-lg font-semibold line-clamp-1">{item.object_name}</h3>
         <p className="text-sm text-gray-600 line-clamp-2 mt-1">{item.description}</p>
       </CardContent>
       <CardFooter className="px-4 pb-4 pt-0 flex-col items-start">

@@ -1,18 +1,11 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-
-// Define types for our auth context
-type User = {
-  id: string;
-  email: string;
-  user_metadata?: {
-    avatar_url?: string;
-  };
-};
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
 type AuthContextType = {
   user: User | null;
+  session: Session | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -20,59 +13,91 @@ type AuthContextType = {
   signOut: () => Promise<void>;
 };
 
-// Create the auth context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Props type for the AuthProvider component
 type AuthProviderProps = {
   children: ReactNode;
 };
 
-// Mock user for development
-const mockUser = {
-  id: 'mock-user-id',
-  email: 'user@example.com',
-  user_metadata: {
-    avatar_url: undefined
-  }
-};
-
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(mockUser); // Default to logged in with mock user
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   
-  // Mock authentication functions
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      }
+    );
+
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+  
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-    setUser(mockUser);
-    setIsLoading(false);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) {
+      setIsLoading(false);
+      throw error;
+    }
   };
   
   const signInWithGoogle = async () => {
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-    setUser(mockUser);
-    setIsLoading(false);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      },
+    });
+    
+    if (error) {
+      setIsLoading(false);
+      throw error;
+    }
   };
   
   const signUp = async (email: string, password: string) => {
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-    setUser(mockUser);
-    setIsLoading(false);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    
+    if (error) {
+      setIsLoading(false);
+      throw error;
+    }
   };
   
   const signOut = async () => {
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-    setUser(null);
-    setIsLoading(false);
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      setIsLoading(false);
+      throw error;
+    }
   };
   
-  // Create context value
   const value = {
     user,
+    session,
     isLoading,
     signIn,
     signInWithGoogle,
@@ -87,7 +112,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 }
 
-// Hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -95,9 +119,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Protected Route component - now allows access even without authentication
-export function RequireAuth({ children }: { children: React.ReactNode }) {
-  // Always allow access for now, no redirects to login
-  return <>{children}</>;
-}

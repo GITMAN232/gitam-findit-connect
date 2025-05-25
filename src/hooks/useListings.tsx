@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ListingObject } from "@/types/ListingTypes";
-import { fetchLostItems, fetchFoundItems } from "@/services/api";
+import { fetchLostObjects, fetchFoundObjects } from "@/services/supabaseApi";
 
 export const PAGE_SIZE = 8;
 
@@ -10,21 +10,21 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState<ListingObject | null>(null);
 
-  // Use React Query to fetch data from our API service
+  // Use React Query to fetch data from Supabase
   const { 
     data: lostItems = [], 
     isLoading: isLoadingLost 
   } = useQuery({
-    queryKey: ["lostItems"],
-    queryFn: fetchLostItems,
+    queryKey: ["lostObjects"],
+    queryFn: fetchLostObjects,
   });
 
   const { 
     data: foundItems = [], 
     isLoading: isLoadingFound 
   } = useQuery({
-    queryKey: ["foundItems"],
-    queryFn: fetchFoundItems,
+    queryKey: ["foundObjects"],
+    queryFn: fetchFoundObjects,
   });
 
   const isLoading = isLoadingLost || isLoadingFound;
@@ -45,7 +45,7 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       items = items.filter(item => 
-        item.item_name.toLowerCase().includes(query) || 
+        item.object_name.toLowerCase().includes(query) || 
         item.description.toLowerCase().includes(query) ||
         item.location.toLowerCase().includes(query)
       );
@@ -53,11 +53,9 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
 
     // Apply category filter
     if (category !== "All categories") {
-      // In a real app, you would have a category field in your database
-      // For now, we're just searching in the item name and description
       const categoryQuery = category.toLowerCase();
       items = items.filter(item => 
-        item.item_name.toLowerCase().includes(categoryQuery) || 
+        item.object_name.toLowerCase().includes(categoryQuery) || 
         item.description.toLowerCase().includes(categoryQuery)
       );
     }

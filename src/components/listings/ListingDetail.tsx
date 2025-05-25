@@ -1,3 +1,4 @@
+
 import React from "react";
 import { format } from "date-fns";
 import { MapPin, Calendar, Clock, Mail, Phone } from "lucide-react";
@@ -41,7 +42,7 @@ const ListingDetail = ({ selectedItem, onOpenChange }: ListingDetailProps) => {
             >
               {selectedItem.type === "lost" ? "Lost" : "Found"}
             </Badge>
-            {selectedItem.item_name}
+            {selectedItem.object_name}
           </DialogTitle>
         </DialogHeader>
         
@@ -51,7 +52,7 @@ const ListingDetail = ({ selectedItem, onOpenChange }: ListingDetailProps) => {
               {selectedItem.image_url ? (
                 <img
                   src={selectedItem.image_url}
-                  alt={selectedItem.item_name}
+                  alt={selectedItem.object_name}
                   className="w-full h-full object-contain"
                 />
               ) : (

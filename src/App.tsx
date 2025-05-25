@@ -6,8 +6,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
 import ReportLost from "./pages/ReportLost";
 import ReportFound from "./pages/ReportFound";
 import Listings from "./pages/Listings";
@@ -22,11 +24,24 @@ const App = () => (
         <Sonner />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           
-          {/* All routes are now accessible without authentication */}
-          <Route path="/report-lost" element={<ReportLost />} />
-          <Route path="/report-found" element={<ReportFound />} />
-          <Route path="/listings" element={<Listings />} />
+          {/* Protected routes */}
+          <Route path="/report-lost" element={
+            <ProtectedRoute>
+              <ReportLost />
+            </ProtectedRoute>
+          } />
+          <Route path="/report-found" element={
+            <ProtectedRoute>
+              <ReportFound />
+            </ProtectedRoute>
+          } />
+          <Route path="/listings" element={
+            <ProtectedRoute>
+              <Listings />
+            </ProtectedRoute>
+          } />
           
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />

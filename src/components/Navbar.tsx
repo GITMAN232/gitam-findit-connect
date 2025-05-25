@@ -36,11 +36,15 @@ const Navbar = () => {
     navigate('/');
   };
 
-  // Get user initials for avatar
   const getUserInitials = () => {
     if (!user || !user.email) return "U";
     const email = user.email;
     return email.charAt(0).toUpperCase();
+  };
+
+  const getUserDisplayName = () => {
+    if (!user) return "";
+    return user.user_metadata?.full_name || user.email || "";
   };
 
   return (
@@ -91,7 +95,8 @@ const Navbar = () => {
               <DropdownMenuContent align="end">
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user.email}</p>
+                    <p className="font-medium text-sm">{getUserDisplayName()}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
@@ -106,7 +111,7 @@ const Navbar = () => {
           ) : (
             <Button 
               className="bg-maroon hover:bg-maroon/90 text-white ml-4"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/auth')}
             >
               Login
             </Button>
@@ -147,21 +152,24 @@ const Navbar = () => {
           </Link>
           
           {user ? (
-            <Button 
-              variant="ghost" 
-              className="justify-start px-0 font-medium text-destructive" 
-              onClick={() => {
-                handleSignOut();
-                setMobileMenuOpen(false);
-              }}
-            >
-              Sign out ({user.email})
-            </Button>
+            <div className="border-t pt-4">
+              <p className="text-sm text-gray-600 mb-2">{getUserDisplayName()}</p>
+              <Button 
+                variant="ghost" 
+                className="justify-start px-0 font-medium text-destructive" 
+                onClick={() => {
+                  handleSignOut();
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Sign out
+              </Button>
+            </div>
           ) : (
             <Button 
               className="bg-maroon hover:bg-maroon/90 text-white w-full" 
               onClick={() => {
-                navigate('/login');
+                navigate('/auth');
                 setMobileMenuOpen(false);
               }}
             >
