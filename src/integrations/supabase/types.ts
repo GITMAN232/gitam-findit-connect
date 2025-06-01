@@ -113,7 +113,72 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_found_objects: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          found_date: string | null
+          id: string | null
+          image_url: string | null
+          location: string | null
+          object_name: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          found_date?: string | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          object_name?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          found_date?: string | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          object_name?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      public_lost_objects: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          image_url: string | null
+          location: string | null
+          lost_date: string | null
+          object_name: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          lost_date?: string | null
+          object_name?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          lost_date?: string | null
+          object_name?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

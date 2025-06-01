@@ -1,16 +1,16 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ListingObject } from "@/types/ListingTypes";
+import { PublicListingObject } from "@/types/ListingTypes";
 import { fetchLostObjects, fetchFoundObjects } from "@/services/supabaseApi";
 
 export const PAGE_SIZE = 8;
 
 export const useListings = (searchQuery: string, category: string, activeTab: string) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedItem, setSelectedItem] = useState<ListingObject | null>(null);
+  const [selectedItem, setSelectedItem] = useState<PublicListingObject | null>(null);
 
-  // Use React Query to fetch data from Supabase
+  // Use React Query to fetch data from Supabase public views
   const { 
     data: lostItems = [], 
     isLoading: isLoadingLost 
@@ -31,14 +31,14 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
 
   // Filter and paginate items
   const filteredItems = useMemo(() => {
-    let items: ListingObject[] = [];
+    let items: PublicListingObject[] = [];
     
-    // Apply tab filter first - ensure proper typing
+    // Apply tab filter first
     if (activeTab === "all" || activeTab === "lost") {
-      items = [...items, ...lostItems as ListingObject[]];
+      items = [...items, ...lostItems];
     }
     if (activeTab === "all" || activeTab === "found") {
-      items = [...items, ...foundItems as ListingObject[]];
+      items = [...items, ...foundItems];
     }
 
     // Apply search filter
