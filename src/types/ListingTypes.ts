@@ -4,7 +4,7 @@ export interface BaseObject {
   id: number;
   created_at: string;
   user_id: string;
-  item_name: string;
+  object_name: string;
   description: string;
   location: string;
   image_url: string | null;
