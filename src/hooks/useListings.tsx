@@ -33,12 +33,12 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
   const filteredItems = useMemo(() => {
     let items: ListingObject[] = [];
     
-    // Apply tab filter first
+    // Apply tab filter first - ensure proper typing
     if (activeTab === "all" || activeTab === "lost") {
-      items = [...items, ...lostItems];
+      items = [...items, ...lostItems as ListingObject[]];
     }
     if (activeTab === "all" || activeTab === "found") {
-      items = [...items, ...foundItems];
+      items = [...items, ...foundItems as ListingObject[]];
     }
 
     // Apply search filter

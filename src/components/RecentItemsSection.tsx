@@ -4,19 +4,18 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchLostItems, fetchFoundItems } from "@/services/api";
-import { format } from "date-fns";
+import { fetchLostObjects, fetchFoundObjects } from "@/services/supabaseApi";
 
 const RecentItemsSection = () => {
   // Fetch real data from the API
   const { data: lostItems = [] } = useQuery({
-    queryKey: ["lostItems"],
-    queryFn: fetchLostItems,
+    queryKey: ["lostObjects"],
+    queryFn: fetchLostObjects,
   });
 
   const { data: foundItems = [] } = useQuery({
-    queryKey: ["foundItems"],
-    queryFn: fetchFoundItems,
+    queryKey: ["foundObjects"],
+    queryFn: fetchFoundObjects,
   });
 
   // Combine and sort by creation date to get the most recent items
@@ -98,7 +97,7 @@ const RecentItemsSection = () => {
                     {item.image_url ? (
                       <img
                         src={item.image_url}
-                        alt={item.item_name}
+                        alt={item.object_name}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -110,7 +109,7 @@ const RecentItemsSection = () => {
                     )}
                   </div>
                   <CardContent className="p-5">
-                    <h3 className="text-lg font-bold text-gray-800 mb-1">{item.item_name}</h3>
+                    <h3 className="text-lg font-bold text-gray-800 mb-1">{item.object_name}</h3>
                     <div className="flex flex-col gap-2 text-sm text-gray-600">
                       <p className="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4">
