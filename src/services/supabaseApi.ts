@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { PublicLostObject, PublicFoundObject } from "@/types/ListingTypes";
 
 export interface LostObjectData {
   object_name: string;
@@ -57,14 +58,25 @@ export const createLostObject = async (data: LostObjectData) => {
 };
 
 // Fetch lost objects using the public view for browsing
-export const fetchLostObjects = async () => {
+export const fetchLostObjects = async (): Promise<PublicLostObject[]> => {
   const { data, error } = await supabase
     .from('public_lost_objects')
     .select('*')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data.map(item => ({ ...item, type: 'lost' }));
+  
+  return data.map(item => ({
+    id: item.id!,
+    object_name: item.object_name!,
+    description: item.description!,
+    location: item.location!,
+    lost_date: item.lost_date!,
+    created_at: item.created_at!,
+    image_url: item.image_url,
+    status: item.status!,
+    type: 'lost' as const
+  }));
 };
 
 // Fetch user's own lost objects (for authenticated users)
@@ -76,7 +88,7 @@ export const fetchUserLostObjects = async () => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data.map(item => ({ ...item, type: 'lost' }));
+  return data.map(item => ({ ...item, type: 'lost' as const }));
 };
 
 // Found Objects API
@@ -95,14 +107,25 @@ export const createFoundObject = async (data: FoundObjectData) => {
 };
 
 // Fetch found objects using the public view for browsing
-export const fetchFoundObjects = async () => {
+export const fetchFoundObjects = async (): Promise<PublicFoundObject[]> => {
   const { data, error } = await supabase
     .from('public_found_objects')
     .select('*')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data.map(item => ({ ...item, type: 'found' }));
+  
+  return data.map(item => ({
+    id: item.id!,
+    object_name: item.object_name!,
+    description: item.description!,
+    location: item.location!,
+    found_date: item.found_date!,
+    created_at: item.created_at!,
+    image_url: item.image_url,
+    status: item.status!,
+    type: 'found' as const
+  }));
 };
 
 // Fetch user's own found objects (for authenticated users)
@@ -114,7 +137,7 @@ export const fetchUserFoundObjects = async () => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data.map(item => ({ ...item, type: 'found' }));
+  return data.map(item => ({ ...item, type: 'found' as const }));
 };
 
 // Get full details of a specific object (with contact info) - requires authentication
@@ -126,7 +149,7 @@ export const getLostObjectDetails = async (id: string) => {
     .single();
 
   if (error) throw error;
-  return { ...data, type: 'lost' };
+  return { ...data, type: 'lost' as const };
 };
 
 export const getFoundObjectDetails = async (id: string) => {
@@ -137,5 +160,5 @@ export const getFoundObjectDetails = async (id: string) => {
     .single();
 
   if (error) throw error;
-  return { ...data, type: 'found' };
+  return { ...data, type: 'found' as const };
 };
