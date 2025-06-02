@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Mail as GoogleIcon } from 'lucide-react'; // Changed to Mail icon as a replacement since Google icon isn't available
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -52,7 +51,7 @@ type SignupValues = z.infer<typeof signupSchema>;
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
   // Get redirect path from location state or use home as default
@@ -100,17 +99,6 @@ const Login = () => {
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleGoogleSignIn = async () => {
-    try {
-      setIsLoading(true);
-      await signInWithGoogle();
-      // The redirect will be handled by the OAuth callback
-    } catch (error) {
-      console.error(error);
       setIsLoading(false);
     }
   };
@@ -232,27 +220,6 @@ const Login = () => {
                     </Form>
                   </TabsContent>
                 </Tabs>
-
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-300" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
-
-                <Button 
-                  variant="outline" 
-                  className="w-full" 
-                  onClick={handleGoogleSignIn}
-                  disabled={isLoading}
-                >
-                  <GoogleIcon className="mr-2 h-5 w-5 text-blue-500" />
-                  Google
-                </Button>
               </CardContent>
               <CardFooter className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">
                 <div>
