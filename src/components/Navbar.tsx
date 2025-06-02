@@ -79,6 +79,11 @@ const Navbar = () => {
           <Link to="/listings" className="font-medium hover:text-maroon transition-colors">
             View Listings
           </Link>
+          {user && (
+            <Link to="/my-reportings" className="font-medium hover:text-maroon transition-colors">
+              My Reports
+            </Link>
+          )}
           
           {user ? (
             <DropdownMenu>
@@ -99,6 +104,12 @@ const Navbar = () => {
                     <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/my-reportings" className="cursor-pointer">
+                    My Reports
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer"
@@ -150,6 +161,11 @@ const Navbar = () => {
           <Link to="/listings" className="font-medium hover:text-maroon transition-colors" onClick={() => setMobileMenuOpen(false)}>
             View Listings
           </Link>
+          {user && (
+            <Link to="/my-reportings" className="font-medium hover:text-maroon transition-colors" onClick={() => setMobileMenuOpen(false)}>
+              My Reports
+            </Link>
+          )}
           
           {user ? (
             <div className="border-t pt-4">

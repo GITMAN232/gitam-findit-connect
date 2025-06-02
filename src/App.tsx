@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import ReportLost from "./pages/ReportLost";
 import ReportFound from "./pages/ReportFound";
 import Listings from "./pages/Listings";
+import MyReportings from "./pages/MyReportings";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,11 @@ const App = () => (
           <Route path="/report-found" element={
             <ProtectedRoute>
               <ReportFound />
+            </ProtectedRoute>
+          } />
+          <Route path="/my-reportings" element={
+            <ProtectedRoute>
+              <MyReportings />
             </ProtectedRoute>
           } />
           

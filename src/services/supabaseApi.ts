@@ -85,10 +85,13 @@ export const fetchLostObjects = async (): Promise<PublicLostObject[]> => {
 
 // Fetch user's own lost objects (requires authentication)
 export const fetchUserLostObjects = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('lost_objects')
     .select('*')
-    .eq('status', 'active')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -138,10 +141,13 @@ export const fetchFoundObjects = async (): Promise<PublicFoundObject[]> => {
 
 // Fetch user's own found objects (requires authentication)
 export const fetchUserFoundObjects = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('found_objects')
     .select('*')
-    .eq('status', 'active')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
