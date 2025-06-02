@@ -26,7 +26,10 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           
-          {/* Protected routes */}
+          {/* Public listings page - no authentication required for browsing */}
+          <Route path="/listings" element={<Listings />} />
+          
+          {/* Protected routes for reporting */}
           <Route path="/report-lost" element={
             <ProtectedRoute>
               <ReportLost />
@@ -35,11 +38,6 @@ const App = () => (
           <Route path="/report-found" element={
             <ProtectedRoute>
               <ReportFound />
-            </ProtectedRoute>
-          } />
-          <Route path="/listings" element={
-            <ProtectedRoute>
-              <Listings />
             </ProtectedRoute>
           } />
           

@@ -57,14 +57,18 @@ export const createLostObject = async (data: LostObjectData) => {
   return result;
 };
 
-// Fetch lost objects using the public view for browsing
+// Fetch lost objects using the public view for browsing (no authentication required)
 export const fetchLostObjects = async (): Promise<PublicLostObject[]> => {
   const { data, error } = await supabase
     .from('public_lost_objects')
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching lost objects:', error);
+    // Return empty array for graceful degradation
+    return [];
+  }
   
   return data.map(item => ({
     id: item.id!,
@@ -79,7 +83,7 @@ export const fetchLostObjects = async (): Promise<PublicLostObject[]> => {
   }));
 };
 
-// Fetch user's own lost objects (for authenticated users)
+// Fetch user's own lost objects (requires authentication)
 export const fetchUserLostObjects = async () => {
   const { data, error } = await supabase
     .from('lost_objects')
@@ -106,14 +110,18 @@ export const createFoundObject = async (data: FoundObjectData) => {
   return result;
 };
 
-// Fetch found objects using the public view for browsing
+// Fetch found objects using the public view for browsing (no authentication required)
 export const fetchFoundObjects = async (): Promise<PublicFoundObject[]> => {
   const { data, error } = await supabase
     .from('public_found_objects')
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching found objects:', error);
+    // Return empty array for graceful degradation
+    return [];
+  }
   
   return data.map(item => ({
     id: item.id!,
@@ -128,7 +136,7 @@ export const fetchFoundObjects = async (): Promise<PublicFoundObject[]> => {
   }));
 };
 
-// Fetch user's own found objects (for authenticated users)
+// Fetch user's own found objects (requires authentication)
 export const fetchUserFoundObjects = async () => {
   const { data, error } = await supabase
     .from('found_objects')
