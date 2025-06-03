@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { PublicLostObject, PublicFoundObject } from "@/types/ListingTypes";
 
@@ -21,11 +20,18 @@ export interface FoundObjectData {
   image_url?: string;
 }
 
-// Upload image to Supabase Storage
+// Upload image to Supabase Storage with user-specific folder structure
 export const uploadImage = async (file: File, bucket: string = 'object-images'): Promise<string> => {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('User must be authenticated to upload images');
+  }
+
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random()}.${fileExt}`;
-  const filePath = `${fileName}`;
+  // Create user-specific folder structure as required by RLS policies
+  const filePath = `${user.id}/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
     .from(bucket)
