@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -50,7 +50,7 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? "bg-white dark:bg-gray-900 shadow-md py-2" : "bg-transparent py-4"
+        scrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
       }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
@@ -84,9 +84,6 @@ const Navbar = () => {
               My Reports
             </Link>
           )}
-          
-          {/* Theme Toggle */}
-          <ThemeToggle />
           
           {user ? (
             <DropdownMenu>
@@ -134,7 +131,6 @@ const Navbar = () => {
 
         {/* Mobile Toggle Button */}
         <div className="md:hidden flex items-center gap-2">
-          <ThemeToggle />
           <button
             className="text-maroon focus:outline-none"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -154,7 +150,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-gray-900 shadow-md py-4 px-6 flex flex-col gap-4">
+        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-md py-4 px-6 flex flex-col gap-4">
           <Link to="/" className="font-medium hover:text-maroon transition-colors" onClick={() => setMobileMenuOpen(false)}>
             Home
           </Link>
