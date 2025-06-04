@@ -27,7 +27,7 @@ const Listings = () => {
   } = useListings(searchQuery, category, activeTab);
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-background text-foreground min-h-screen">
       <Navbar />
       <div className="pt-28 pb-20">
         <div className="container mx-auto px-4">
@@ -36,7 +36,7 @@ const Listings = () => {
               <h1 className="text-3xl md:text-4xl font-bold text-maroon mb-2">
                 Lost & Found Objects
               </h1>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Browse through all reported lost and found objects on campus
               </p>
             </div>
