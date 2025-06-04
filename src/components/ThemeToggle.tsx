@@ -35,6 +35,5 @@ export function ThemeToggle() {
     </DropdownMenu>
   )
 }
-</DropdownMenu>
 
 export default ThemeToggle
