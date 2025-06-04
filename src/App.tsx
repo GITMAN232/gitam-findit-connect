@@ -20,7 +20,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="system" storageKey="findit-theme">
+    <ThemeProvider defaultTheme="light" storageKey="findit-theme">
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
