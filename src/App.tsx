@@ -22,17 +22,7 @@ const queryClient = new QueryClient();
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Check if user has seen the loading animation before
-    const hasSeenLoading = localStorage.getItem('hasSeenLoading');
-    
-    if (hasSeenLoading) {
-      setIsLoading(false);
-    }
-  }, []);
-
   const handleLoadingComplete = () => {
-    localStorage.setItem('hasSeenLoading', 'true');
     setIsLoading(false);
   };
 
