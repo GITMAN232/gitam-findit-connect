@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, MapPin, Image, Mail, Phone, Star } from "lucide-react";
+import { CalendarIcon, MapPin, Image, Mail, MessageCircle, Star } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -221,13 +220,13 @@ const ReportFound = () => {
                       <FormField control={form.control} name="phone" render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-lg flex items-center gap-2">
-                            <Phone className="w-4 h-4" />
-                            Phone (Optional)
+                            <MessageCircle className="w-4 h-4" />
+                            WhatsApp Number (Optional)
                           </FormLabel>
                           <FormControl>
                             <Input placeholder="e.g., +91 9876543210" type="tel" {...field} />
                           </FormControl>
-                          <FormDescription>Optional contact number for quicker communication</FormDescription>
+                          <FormDescription>Optional WhatsApp number for quicker communication</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )} />

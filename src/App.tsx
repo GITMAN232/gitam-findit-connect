@@ -1,4 +1,5 @@
 
+import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,7 @@ import { Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import LoadingAnimation from "./components/LoadingAnimation";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -17,42 +19,64 @@ import MyReportings from "./pages/MyReportings";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          
-          {/* Public listings page - no authentication required for browsing */}
-          <Route path="/listings" element={<Listings />} />
-          
-          {/* Protected routes for reporting */}
-          <Route path="/report-lost" element={
-            <ProtectedRoute>
-              <ReportLost />
-            </ProtectedRoute>
-          } />
-          <Route path="/report-found" element={
-            <ProtectedRoute>
-              <ReportFound />
-            </ProtectedRoute>
-          } />
-          <Route path="/my-reportings" element={
-            <ProtectedRoute>
-              <MyReportings />
-            </ProtectedRoute>
-          } />
-          
-          {/* Catch-all route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user has seen the loading animation before
+    const hasSeenLoading = localStorage.getItem('hasSeenLoading');
+    
+    if (hasSeenLoading) {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleLoadingComplete = () => {
+    localStorage.setItem('hasSeenLoading', 'true');
+    setIsLoading(false);
+  };
+
+  if (isLoading) {
+    return <LoadingAnimation onComplete={handleLoadingComplete} />;
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            
+            {/* Public listings page - no authentication required for browsing */}
+            <Route path="/listings" element={<Listings />} />
+            
+            {/* Protected routes for reporting */}
+            <Route path="/report-lost" element={
+              <ProtectedRoute>
+                <ReportLost />
+              </ProtectedRoute>
+            } />
+            <Route path="/report-found" element={
+              <ProtectedRoute>
+                <ReportFound />
+              </ProtectedRoute>
+            } />
+            <Route path="/my-reportings" element={
+              <ProtectedRoute>
+                <MyReportings />
+              </ProtectedRoute>
+            } />
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

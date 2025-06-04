@@ -14,6 +14,7 @@ import { PublicListingObject, ListingObject } from "@/types/ListingTypes";
 import { getLostObjectDetails, getFoundObjectDetails } from "@/services/supabaseApi";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import ContactButtons from "./ContactButtons";
 
 interface ListingDetailProps {
   selectedItem: PublicListingObject | null;
@@ -188,36 +189,43 @@ const ListingDetail = ({ selectedItem, onOpenChange }: ListingDetailProps) => {
                   </p>
                 </div>
               ) : fullItem ? (
-                <div className="space-y-3">
-                  {fullItem.type === "lost" ? (
-                    <div className="flex items-start gap-3">
-                      <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
-                      <div>
-                        <p className="font-medium">Contact</p>
-                        <p className="text-gray-600">{(fullItem as any).contact_info}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    {fullItem.type === "lost" ? (
                       <div className="flex items-start gap-3">
                         <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
                         <div>
-                          <p className="font-medium">Email</p>
-                          <p className="text-gray-600">{(fullItem as any).email}</p>
+                          <p className="font-medium">Contact</p>
+                          <p className="text-gray-600">{(fullItem as any).contact_info}</p>
                         </div>
                       </div>
-                      
-                      {(fullItem as any).phone && (
+                    ) : (
+                      <>
                         <div className="flex items-start gap-3">
-                          <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
+                          <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
                           <div>
-                            <p className="font-medium">Phone</p>
-                            <p className="text-gray-600">{(fullItem as any).phone}</p>
+                            <p className="font-medium">Email</p>
+                            <p className="text-gray-600">{(fullItem as any).email}</p>
                           </div>
                         </div>
-                      )}
-                    </>
-                  )}
+                        
+                        {(fullItem as any).phone && (
+                          <div className="flex items-start gap-3">
+                            <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
+                            <div>
+                              <p className="font-medium">WhatsApp</p>
+                              <p className="text-gray-600">{(fullItem as any).phone}</p>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Contact Buttons */}
+                  <div className="pt-2 border-t border-gray-100">
+                    <ContactButtons item={fullItem} />
+                  </div>
                 </div>
               ) : null}
             </div>
