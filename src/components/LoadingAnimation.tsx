@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Binoculars, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 interface LoadingAnimationProps {
   onComplete: () => void;
@@ -8,7 +8,7 @@ interface LoadingAnimationProps {
 
 const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
   const [progress, setProgress] = useState(0);
-  const [binocularPosition, setBinocularPosition] = useState(0);
+  const [magnifyingGlassPosition, setMagnifyingGlassPosition] = useState(0);
   const [showPulse, setShowPulse] = useState(false);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
     const timer = setInterval(() => {
       setProgress(prev => {
         const newProgress = prev + progressStep;
-        setBinocularPosition(newProgress);
+        setMagnifyingGlassPosition(newProgress);
         
         if (newProgress >= 100) {
           clearInterval(timer);
@@ -68,18 +68,20 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
 
         {/* Animation Icons */}
         <div className="relative w-full h-12 flex items-center">
-          {/* Binoculars moving across */}
+          {/* Magnifying Glass moving across */}
           <div 
             className="absolute transition-all duration-75 ease-out"
-            style={{ left: `${binocularPosition}%`, transform: 'translateX(-50%)' }}
+            style={{ left: `${magnifyingGlassPosition}%`, transform: 'translateX(-50%)' }}
           >
-            <Binoculars 
-              className="w-8 h-8 text-maroon" 
+            <span 
+              className="text-2xl"
               style={{ 
-                transform: binocularPosition >= 100 ? 'scale(1.2)' : 'scale(1)',
+                transform: magnifyingGlassPosition >= 100 ? 'scale(1.2)' : 'scale(1)',
                 transition: 'transform 0.3s ease'
               }}
-            />
+            >
+              🔍
+            </span>
           </div>
 
           {/* Location Pin at the end */}
