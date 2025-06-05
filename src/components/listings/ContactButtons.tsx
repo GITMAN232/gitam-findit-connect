@@ -13,7 +13,8 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
   console.log('ContactButtons - item type:', item.type);
   
   const handleWhatsAppClick = () => {
-    const phone = item.type === 'found' ? (item as any).phone : null;
+    // For found items, check for phone field. For lost items, check for phone in contact_info or separate phone field
+    const phone = item.type === 'found' ? (item as any).phone : (item as any).phone;
     console.log('WhatsApp click - phone:', phone);
     
     if (!phone) {
@@ -24,7 +25,7 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
     // Clean phone number (remove spaces, dashes, etc.)
     const cleanPhone = phone.replace(/[^\d+]/g, '');
     
-    const message = `Hey, I found your post for "${item.object_name}" on the G-Lost&Found site. Can we connect?`;
+    const message = `Hi, I saw your report on GITAM Lost & Found for "${item.object_name}". I might have some info!`;
     const encodedMessage = encodeURIComponent(message);
     
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
@@ -42,9 +43,9 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
     window.open(mailtoUrl);
   };
 
-  // Debug logging
-  const hasWhatsApp = item.type === 'found' && (item as any).phone;
-  const hasEmail = item.type === 'lost' ? (item as any).contact_info : (item as any).email;
+  // Check for available contact methods
+  const hasWhatsApp = !!(item as any).phone;
+  const hasEmail = item.type === 'lost' ? !!(item as any).contact_info : !!(item as any).email;
   
   console.log('ContactButtons - hasWhatsApp:', hasWhatsApp);
   console.log('ContactButtons - hasEmail:', hasEmail);
