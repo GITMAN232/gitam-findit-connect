@@ -56,12 +56,12 @@ const Navbar = () => {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <div className="w-10 h-10 bg-maroon rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-lg">F</span>
+            <span className="text-white font-bold text-lg">G</span>
           </div>
           <span className="font-bold text-xl">
-            <span className="text-maroon">FindIt</span>
-            <span className="text-mustard">@</span>
-            <span className="text-maroon">GITAM</span>
+            <span className="text-maroon">G-Lost</span>
+            <span className="text-mustard">&</span>
+            <span className="text-maroon">Found</span>
           </span>
         </Link>
 

@@ -9,14 +9,22 @@ interface ContactButtonsProps {
 }
 
 const ContactButtons = ({ item }: ContactButtonsProps) => {
+  console.log('ContactButtons - item:', item);
+  console.log('ContactButtons - item type:', item.type);
+  
   const handleWhatsAppClick = () => {
     const phone = item.type === 'found' ? (item as any).phone : null;
-    if (!phone) return;
+    console.log('WhatsApp click - phone:', phone);
+    
+    if (!phone) {
+      console.log('No phone number available');
+      return;
+    }
     
     // Clean phone number (remove spaces, dashes, etc.)
     const cleanPhone = phone.replace(/[^\d+]/g, '');
     
-    const message = `Hey, I found your post for "${item.object_name}" on the GITAM Lost & Found site. Can we connect?`;
+    const message = `Hey, I found your post for "${item.object_name}" on the G-Lost&Found site. Can we connect?`;
     const encodedMessage = encodeURIComponent(message);
     
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
@@ -28,17 +36,29 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
     if (!email) return;
     
     const subject = `Regarding your ${item.type} item: ${item.object_name}`;
-    const body = `Hi, I saw your listing for "${item.object_name}" on FindIt GITAM and would like to connect.`;
+    const body = `Hi, I saw your listing for "${item.object_name}" on G-Lost&Found and would like to connect.`;
     
     const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(mailtoUrl);
   };
 
+  // Debug logging
   const hasWhatsApp = item.type === 'found' && (item as any).phone;
   const hasEmail = item.type === 'lost' ? (item as any).contact_info : (item as any).email;
+  
+  console.log('ContactButtons - hasWhatsApp:', hasWhatsApp);
+  console.log('ContactButtons - hasEmail:', hasEmail);
+  console.log('ContactButtons - phone value:', (item as any).phone);
+  console.log('ContactButtons - email value:', item.type === 'lost' ? (item as any).contact_info : (item as any).email);
 
   if (!hasEmail && !hasWhatsApp) {
-    return null;
+    console.log('No contact methods available');
+    return (
+      <div className="space-y-2">
+        <h4 className="font-medium text-sm text-gray-700 mb-2">Quick Contact</h4>
+        <p className="text-sm text-gray-500">No contact information available</p>
+      </div>
+    );
   }
 
   return (
