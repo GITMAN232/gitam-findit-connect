@@ -22,13 +22,7 @@ const ListingDetail = ({ selectedItem, onOpenChange }: ListingDetailProps) => {
 
   useEffect(() => {
     const fetchFullDetails = async () => {
-      if (!selectedItem) {
-        setFullItem(null);
-        setHasContactError(false);
-        return;
-      }
-
-      if (!user) {
+      if (!selectedItem || !user) {
         setFullItem(null);
         setHasContactError(false);
         return;
@@ -36,13 +30,11 @@ const ListingDetail = ({ selectedItem, onOpenChange }: ListingDetailProps) => {
 
       setIsLoading(true);
       setHasContactError(false);
+      
       try {
-        let details;
-        if (selectedItem.type === 'lost') {
-          details = await getLostObjectDetails(selectedItem.id);
-        } else {
-          details = await getFoundObjectDetails(selectedItem.id);
-        }
+        const details = selectedItem.type === 'lost' 
+          ? await getLostObjectDetails(selectedItem.id)
+          : await getFoundObjectDetails(selectedItem.id);
         setFullItem(details);
       } catch (error) {
         console.error('Error fetching full details:', error);
@@ -58,7 +50,6 @@ const ListingDetail = ({ selectedItem, onOpenChange }: ListingDetailProps) => {
 
   if (!selectedItem) return null;
 
-  // Use full item details if available and user is authenticated, otherwise use public item
   const displayItem = fullItem || selectedItem;
 
   return (
