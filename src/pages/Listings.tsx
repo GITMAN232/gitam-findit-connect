@@ -1,5 +1,6 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,11 @@ const Listings = () => {
     setSelectedItem,
   } = useListings(searchQuery, category, activeTab);
 
+  // Fix scroll behavior - scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="bg-background text-foreground min-h-screen">
       <Navbar />
@@ -44,16 +50,16 @@ const Listings = () => {
               <Button 
                 variant="outline" 
                 className="bg-maroon/10 hover:bg-maroon/20 text-maroon border-maroon"
-                onClick={() => window.location.href="/report-lost"}
+                asChild
               >
-                Report Lost Object
+                <Link to="/report-lost">Report Lost Object</Link>
               </Button>
               <Button 
                 variant="outline" 
                 className="bg-mustard/10 hover:bg-mustard/20 text-mustard border-mustard"
-                onClick={() => window.location.href="/report-found"}
+                asChild
               >
-                Report Found Object
+                <Link to="/report-found">Report Found Object</Link>
               </Button>
             </div>
           </div>

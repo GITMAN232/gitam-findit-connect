@@ -16,7 +16,7 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
     // Clean phone number (remove spaces, dashes, etc.)
     const cleanPhone = phone.replace(/[^\d+]/g, '');
     
-    const message = `Hey, I saw your listing for the ${item.type} item "${item.object_name}". I may have information about it.`;
+    const message = `Hey, I found your post for "${item.object_name}" on the GITAM Lost & Found site. Can we connect?`;
     const encodedMessage = encodeURIComponent(message);
     
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
