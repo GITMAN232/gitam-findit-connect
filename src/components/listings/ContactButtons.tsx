@@ -13,12 +13,12 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
   console.log('ContactButtons - item type:', item.type);
   
   const handleWhatsAppClick = () => {
-    // For both lost and found items, check for phone field
-    const phone = (item as any).phone;
+    // Only found items have phone numbers in our current database structure
+    const phone = item.type === 'found' ? (item as any).phone : null;
     console.log('WhatsApp click - phone:', phone);
     
     if (!phone) {
-      console.log('No phone number available');
+      console.log('No phone number available for this item type');
       return;
     }
     
@@ -44,12 +44,13 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
   };
 
   // Check for available contact methods
-  const hasWhatsApp = !!(item as any).phone;
+  // Only found items have phone numbers in current database structure
+  const hasWhatsApp = item.type === 'found' && !!(item as any).phone;
   const hasEmail = item.type === 'lost' ? !!(item as any).contact_info : !!(item as any).email;
   
   console.log('ContactButtons - hasWhatsApp:', hasWhatsApp);
   console.log('ContactButtons - hasEmail:', hasEmail);
-  console.log('ContactButtons - phone value:', (item as any).phone);
+  console.log('ContactButtons - phone value (found items only):', item.type === 'found' ? (item as any).phone : 'N/A for lost items');
   console.log('ContactButtons - email value:', item.type === 'lost' ? (item as any).contact_info : (item as any).email);
 
   if (!hasEmail && !hasWhatsApp) {

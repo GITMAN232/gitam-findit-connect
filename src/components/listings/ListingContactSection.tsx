@@ -74,15 +74,12 @@ const ListingContactSection = ({
                   </div>
                 </div>
                 
-                {(fullItem as any).phone && (
-                  <div className="flex items-start gap-3">
-                    <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="font-medium">Phone Number</p>
-                      <p className="text-gray-600">{(fullItem as any).phone}</p>
-                    </div>
-                  </div>
-                )}
+                {/* Lost items don't have phone numbers in current database structure */}
+                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-600">
+                    <strong>Note:</strong> Phone number is only available for found items. For lost items, please use email contact.
+                  </p>
+                </div>
               </>
             ) : (
               <>
