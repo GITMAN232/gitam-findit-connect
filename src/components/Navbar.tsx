@@ -1,43 +1,64 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, User, LogOut, ChevronDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      navigate('/auth');
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
   };
 
-return (
-  <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 transition-colors">
-    <div className="container mx-auto px-4">
-      <div className="flex items-center justify-between h-16">
-        {/* Logo and brand */}
-        <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+  const getUserInitials = () => {
+    if (!user || !user.email) return "U";
+    const email = user.email;
+    return email.charAt(0).toUpperCase();
+  };
+
+  const getUserDisplayName = () => {
+    if (!user) return "";
+    return user.user_metadata?.full_name || user.email || "";
+  };
+
+  return (
+    <nav
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        scrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+      }`}
+    >
+      <div className="container mx-auto px-4 flex justify-between items-center">
+        <Link to="/" className="flex items-center gap-2">
           <div className="w-10 h-10 bg-maroon rounded-full flex items-center justify-center">
             <span className="text-white font-bold text-lg">G</span>
           </div>
-          <span className="font-bold text-xl hidden sm:block">
+          <span className="font-bold text-xl">
             <span className="text-maroon">G-Lost</span>
             <span className="text-mustard">&</span>
             <span className="text-maroon">Found</span>
@@ -45,127 +66,138 @@ return (
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
-          <Link 
-            to="/" 
-            className="text-gray-700 hover:text-maroon transition-colors font-medium"
-          >
+        <div className="hidden md:flex items-center gap-6">
+          <Link to="/" className="font-medium hover:text-maroon transition-colors">
             Home
           </Link>
-          <Link 
-            to="/listings" 
-            className="text-gray-700 hover:text-maroon transition-colors font-medium"
-          >
-            Browse Items
+          <Link to="/report-lost" className="font-medium hover:text-maroon transition-colors">
+            Report Lost
           </Link>
-          
+          <Link to="/report-found" className="font-medium hover:text-maroon transition-colors">
+            Report Found
+          </Link>
+          <Link to="/listings" className="font-medium hover:text-maroon transition-colors">
+            View Listings
+          </Link>
           {user && (
-            <Link 
-              to="/my-reportings" 
-              className="text-gray-700 hover:text-maroon transition-colors font-medium"
-            >
+            <Link to="/my-reportings" className="font-medium hover:text-maroon transition-colors">
               My Reports
             </Link>
           )}
+          
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar>
+                    <AvatarImage src={user.user_metadata?.avatar_url} />
+                    <AvatarFallback className="bg-maroon text-white">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-1 leading-none">
+                    <p className="font-medium text-sm">{getUserDisplayName()}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/my-reportings" className="cursor-pointer">
+                    My Reports
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={handleSignOut}
+                >
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button 
+              className="bg-maroon hover:bg-maroon/90 text-white ml-4"
+              onClick={() => navigate('/auth')}
+            >
+              Login
+            </Button>
+          )}
         </div>
 
-        {/* Right side actions */}
-        <div className="flex items-center gap-3">
-          {user ? (
-            <div className="flex items-center gap-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 p-2">
-                    <div className="w-8 h-8 bg-maroon rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-medium">
-                        {user.email?.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <span className="hidden sm:block text-sm font-medium text-gray-700">
-                      {user.email?.split('@')[0]}
-                    </span>
-                    <ChevronDown className="h-4 w-4 text-gray-500" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/my-reportings" className="w-full">
-                      <User className="mr-2 h-4 w-4" />
-                      My Reports
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+        {/* Mobile Toggle Button */}
+        <div className="md:hidden flex items-center gap-2">
+          <button
+            className="text-maroon focus:outline-none"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+        </div>
+      </div>
 
-              <Button asChild className="bg-maroon hover:bg-maroon/90 hidden sm:flex">
-                <Link to="/report-lost">Report Lost</Link>
-              </Button>
-              
-              <Button variant="outline" asChild className="border-mustard text-mustard hover:bg-mustard/10 hidden sm:flex">
-                <Link to="/report-found">Report Found</Link>
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-md py-4 px-6 flex flex-col gap-4">
+          <Link to="/" className="font-medium hover:text-maroon transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            Home
+          </Link>
+          <Link to="/report-lost" className="font-medium hover:text-maroon transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            Report Lost
+          </Link>
+          <Link to="/report-found" className="font-medium hover:text-maroon transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            Report Found
+          </Link>
+          <Link to="/listings" className="font-medium hover:text-maroon transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            View Listings
+          </Link>
+          {user && (
+            <Link to="/my-reportings" className="font-medium hover:text-maroon transition-colors" onClick={() => setMobileMenuOpen(false)}>
+              My Reports
+            </Link>
+          )}
+          
+          {user ? (
+            <div className="border-t pt-4">
+              <p className="text-sm text-gray-600 mb-2">{getUserDisplayName()}</p>
+              <Button 
+                variant="ghost" 
+                className="justify-start px-0 font-medium text-destructive" 
+                onClick={() => {
+                  handleSignOut();
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Sign out
               </Button>
             </div>
           ) : (
-            <Button asChild className="bg-maroon hover:bg-maroon/90">
-              <Link to="/auth">Sign In</Link>
+            <Button 
+              className="bg-maroon hover:bg-maroon/90 text-white w-full" 
+              onClick={() => {
+                navigate('/auth');
+                setMobileMenuOpen(false);
+              }}
+            >
+              Login
             </Button>
           )}
-
-          {/* Mobile menu */}
-          <div className="md:hidden">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem asChild>
-                  <Link to="/" className="w-full">Home</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/listings" className="w-full">Browse Items</Link>
-                </DropdownMenuItem>
-                {user && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/my-reportings" className="w-full">My Reports</Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                {user ? (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link to="/report-lost" className="w-full">Report Lost</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/report-found" className="w-full">Report Found</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign out
-                    </DropdownMenuItem>
-                  </>
-                ) : (
-                  <DropdownMenuItem asChild>
-                    <Link to="/auth" className="w-full">Sign In</Link>
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
         </div>
-      </div>
-    </div>
-  </nav>
-);
+      )}
+    </nav>
+  );
 };
 
 export default Navbar;
