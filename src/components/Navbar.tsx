@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, User, LogOut, ChevronDown } from "lucide-react";
@@ -12,16 +13,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
-import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await signOut();
       navigate('/auth');
     } catch (error) {
       console.error("Logout failed:", error);
@@ -29,7 +29,7 @@ const Navbar = () => {
   };
 
 return (
-  <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 transition-colors">
+  <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 transition-colors">
     <div className="container mx-auto px-4">
       <div className="flex items-center justify-between h-16">
         {/* Logo and brand */}
@@ -48,13 +48,13 @@ return (
         <div className="hidden md:flex items-center space-x-8">
           <Link 
             to="/" 
-            className="text-gray-700 dark:text-gray-200 hover:text-maroon dark:hover:text-maroon transition-colors font-medium"
+            className="text-gray-700 hover:text-maroon transition-colors font-medium"
           >
             Home
           </Link>
           <Link 
             to="/listings" 
-            className="text-gray-700 dark:text-gray-200 hover:text-maroon dark:hover:text-maroon transition-colors font-medium"
+            className="text-gray-700 hover:text-maroon transition-colors font-medium"
           >
             Browse Items
           </Link>
@@ -62,7 +62,7 @@ return (
           {user && (
             <Link 
               to="/my-reportings" 
-              className="text-gray-700 dark:text-gray-200 hover:text-maroon dark:hover:text-maroon transition-colors font-medium"
+              className="text-gray-700 hover:text-maroon transition-colors font-medium"
             >
               My Reports
             </Link>
@@ -71,8 +71,6 @@ return (
 
         {/* Right side actions */}
         <div className="flex items-center gap-3">
-          <ThemeToggle />
-          
           {user ? (
             <div className="flex items-center gap-3">
               <DropdownMenu>
@@ -83,7 +81,7 @@ return (
                         {user.email?.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <span className="hidden sm:block text-sm font-medium text-gray-700">
                       {user.email?.split('@')[0]}
                     </span>
                     <ChevronDown className="h-4 w-4 text-gray-500" />

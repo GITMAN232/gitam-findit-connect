@@ -7,7 +7,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./contexts/AuthContext";
-import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingAnimation from "./components/LoadingAnimation";
 import Index from "./pages/Index";
@@ -33,41 +32,39 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              
-              {/* Public listings page - no authentication required for browsing */}
-              <Route path="/listings" element={<Listings />} />
-              
-              {/* Protected routes for reporting */}
-              <Route path="/report-lost" element={
-                <ProtectedRoute>
-                  <ReportLost />
-                </ProtectedRoute>
-              } />
-              <Route path="/report-found" element={
-                <ProtectedRoute>
-                  <ReportFound />
-                </ProtectedRoute>
-              } />
-              <Route path="/my-reportings" element={
-                <ProtectedRoute>
-                  <MyReportings />
-                </ProtectedRoute>
-              } />
-              
-              {/* Catch-all route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </TooltipProvider>
-        </AuthProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            
+            {/* Public listings page - no authentication required for browsing */}
+            <Route path="/listings" element={<Listings />} />
+            
+            {/* Protected routes for reporting */}
+            <Route path="/report-lost" element={
+              <ProtectedRoute>
+                <ReportLost />
+              </ProtectedRoute>
+            } />
+            <Route path="/report-found" element={
+              <ProtectedRoute>
+                <ReportFound />
+              </ProtectedRoute>
+            } />
+            <Route path="/my-reportings" element={
+              <ProtectedRoute>
+                <MyReportings />
+              </ProtectedRoute>
+            } />
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
