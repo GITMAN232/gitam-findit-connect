@@ -13,8 +13,8 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
   console.log('ContactButtons - item type:', item.type);
   
   const handleWhatsAppClick = () => {
-    // For found items, check for phone field. For lost items, check for phone in contact_info or separate phone field
-    const phone = item.type === 'found' ? (item as any).phone : (item as any).phone;
+    // For both lost and found items, check for phone field
+    const phone = (item as any).phone;
     console.log('WhatsApp click - phone:', phone);
     
     if (!phone) {
@@ -25,7 +25,7 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
     // Clean phone number (remove spaces, dashes, etc.)
     const cleanPhone = phone.replace(/[^\d+]/g, '');
     
-    const message = `Hi, I saw your report on GITAM Lost & Found for "${item.object_name}". I might have some info!`;
+    const message = `Hi, I saw your report for "${item.object_name}" on the GITAM Lost & Found portal. Can we connect?`;
     const encodedMessage = encodeURIComponent(message);
     
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
