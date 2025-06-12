@@ -65,13 +65,22 @@ const ListingContactSection = ({
         <div className="space-y-4">
           <div className="space-y-3">
             {fullItem.type === "lost" ? (
-              <div className="flex items-start gap-3">
-                <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
-                <div>
-                  <p className="font-medium">Contact</p>
-                  <p className="text-gray-600">{(fullItem as any).contact_info}</p>
+              <>
+                <div className="flex items-start gap-3">
+                  <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Email</p>
+                    <p className="text-gray-600">{(fullItem as any).contact_info}</p>
+                  </div>
                 </div>
-              </div>
+                
+                {/* Lost items don't have phone numbers in current database structure */}
+                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-600">
+                    <strong>Note:</strong> Phone number is only available for found items. For lost items, please use email contact.
+                  </p>
+                </div>
+              </>
             ) : (
               <>
                 <div className="flex items-start gap-3">
@@ -86,7 +95,7 @@ const ListingContactSection = ({
                   <div className="flex items-start gap-3">
                     <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
                     <div>
-                      <p className="font-medium">WhatsApp</p>
+                      <p className="font-medium">Phone Number</p>
                       <p className="text-gray-600">{(fullItem as any).phone}</p>
                     </div>
                   </div>

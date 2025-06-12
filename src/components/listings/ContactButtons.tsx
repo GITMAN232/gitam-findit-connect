@@ -13,18 +13,19 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
   console.log('ContactButtons - item type:', item.type);
   
   const handleWhatsAppClick = () => {
+    // Only found items have phone numbers in our current database structure
     const phone = item.type === 'found' ? (item as any).phone : null;
     console.log('WhatsApp click - phone:', phone);
     
     if (!phone) {
-      console.log('No phone number available');
+      console.log('No phone number available for this item type');
       return;
     }
     
     // Clean phone number (remove spaces, dashes, etc.)
     const cleanPhone = phone.replace(/[^\d+]/g, '');
     
-    const message = `Hey, I found your post for "${item.object_name}" on the G-Lost&Found site. Can we connect?`;
+    const message = `Hi, I saw your report for "${item.object_name}" on the GITAM Lost & Found portal. Can we connect?`;
     const encodedMessage = encodeURIComponent(message);
     
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
@@ -42,13 +43,14 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
     window.open(mailtoUrl);
   };
 
-  // Debug logging
-  const hasWhatsApp = item.type === 'found' && (item as any).phone;
-  const hasEmail = item.type === 'lost' ? (item as any).contact_info : (item as any).email;
+  // Check for available contact methods
+  // Only found items have phone numbers in current database structure
+  const hasWhatsApp = item.type === 'found' && !!(item as any).phone;
+  const hasEmail = item.type === 'lost' ? !!(item as any).contact_info : !!(item as any).email;
   
   console.log('ContactButtons - hasWhatsApp:', hasWhatsApp);
   console.log('ContactButtons - hasEmail:', hasEmail);
-  console.log('ContactButtons - phone value:', (item as any).phone);
+  console.log('ContactButtons - phone value (found items only):', item.type === 'found' ? (item as any).phone : 'N/A for lost items');
   console.log('ContactButtons - email value:', item.type === 'lost' ? (item as any).contact_info : (item as any).email);
 
   if (!hasEmail && !hasWhatsApp) {
