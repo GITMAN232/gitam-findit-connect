@@ -40,7 +40,7 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col items-center justify-center transition-colors duration-300">
+    <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-colors duration-300">
       {/* Logo */}
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-2">
@@ -53,13 +53,13 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
             <span className="text-maroon">Found</span>
           </span>
         </div>
-        <p className="text-gray-600 dark:text-gray-300 text-center">Connecting lost items with their owners</p>
+        <p className="text-gray-600 text-center">Connecting lost items with their owners</p>
       </div>
 
       {/* Animation Container */}
       <div className="relative w-80 mb-8">
         {/* Progress Bar Background */}
-        <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full mb-8 overflow-hidden">
+        <div className="w-full h-3 bg-gray-200 rounded-full mb-8 overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-maroon to-mustard rounded-full transition-all duration-75 ease-out relative"
             style={{ width: `${progress}%` }}
@@ -102,19 +102,19 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
 
       {/* Loading Text */}
       <div className="text-center">
-        <div className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">
+        <div className="text-lg font-medium text-gray-700 mb-2">
           {progress < 30 ? 'Searching...' : progress < 70 ? 'Scanning campus...' : progress < 95 ? 'Almost there...' : 'Found it!'}
         </div>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+        <div className="text-sm text-gray-500">
           {Math.round(progress)}% complete
         </div>
       </div>
 
       {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-maroon/5 dark:bg-maroon/10 rounded-full animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-mustard/5 dark:bg-mustard/10 rounded-full animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 right-1/6 w-16 h-16 bg-maroon/5 dark:bg-maroon/10 rounded-full animate-pulse delay-500"></div>
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-maroon/5 rounded-full animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-mustard/5 rounded-full animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 right-1/6 w-16 h-16 bg-maroon/5 rounded-full animate-pulse delay-500"></div>
       </div>
     </div>
   );
