@@ -111,7 +111,7 @@ const ReportLost = () => {
             <div className="max-w-4xl mx-auto">
               {/* Hero Section */}
               <div className="text-center mb-12 space-y-4">
-                <div className="inline-flex objects-center gap-2 bg-maroon/10 text-maroon px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <div className="inline-flex items-center gap-2 bg-maroon/10 text-maroon px-4 py-2 rounded-full text-sm font-medium mb-4">
                   <span>🔍</span>
                   Lost Something?
                 </div>
@@ -127,8 +127,8 @@ const ReportLost = () => {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                   {/* Object Details Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex objects-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-maroon/10 rounded-xl flex objects-center justify-center">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-maroon/10 rounded-xl flex items-center justify-center">
                         <span className="text-lg">🧾</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Object Details</h2>
@@ -153,31 +153,39 @@ const ReportLost = () => {
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
-                                <div className="relative">
-                                  <Button
-                                    variant="outline"
-                                    className={`w-full h-14 px-4 pt-6 pb-2 text-left font-normal border-2 rounded-xl bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gray-300 focus:border-maroon/60 ${
-                                      !field.value ? "text-gray-500" : "text-gray-900"
-                                    }`}
-                                  >
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  className={`w-full h-14 px-4 pt-6 pb-2 text-left font-normal border-2 rounded-xl bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gray-300 focus:border-maroon/60 ${
+                                    !field.value ? "text-gray-500" : "text-gray-900"
+                                  }`}
+                                >
+                                  <span className="flex-1">
                                     {field.value ? format(field.value, "PPP") : ""}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
+                                  </span>
+                                  <CalendarIcon className="h-4 w-4 opacity-50 ml-2" />
                                   <label className={`absolute left-4 transition-all duration-300 pointer-events-none ${
                                     field.value ? "top-2 text-xs font-medium text-maroon" : "top-1/2 transform -translate-y-1/2 text-base text-gray-500"
                                   }`}>
-                                    When did you last see it? *
+                                    {field.value ? "When did you last see it? *" : "Select date..."}
                                   </label>
-                                </div>
+                                </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 bg-white z-50" align="start">
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 disabled={date => date > new Date() || date < new Date("1900-01-01")}
                                 initialFocus
+                                className="rounded-md border-0"
+                                classNames={{
+                                  day_selected: "bg-maroon text-white hover:bg-maroon hover:text-white focus:bg-maroon focus:text-white",
+                                  day_today: "bg-mustard/20 text-maroon font-bold",
+                                  nav_button: "hover:bg-maroon/10",
+                                  head_cell: "text-maroon font-medium"
+                                }}
                               />
                             </PopoverContent>
                           </Popover>
@@ -204,8 +212,8 @@ const ReportLost = () => {
 
                   {/* Location Info Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex objects-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-mustard/10 rounded-xl flex objects-center justify-center">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-mustard/10 rounded-xl flex items-center justify-center">
                         <span className="text-lg">📍</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Location Info</h2>
@@ -230,8 +238,8 @@ const ReportLost = () => {
 
                   {/* Contact Info Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex objects-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-green-500/10 rounded-xl flex objects-center justify-center">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
                         <span className="text-lg">📞</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Contact Info</h2>
@@ -283,8 +291,8 @@ const ReportLost = () => {
 
                   {/* Image Upload Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex objects-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex objects-center justify-center">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
                         <span className="text-lg">📸</span>
                       </div>
                       <div className="flex-1">
@@ -315,12 +323,12 @@ const ReportLost = () => {
                       className="bg-maroon hover:bg-mustard text-white font-semibold py-4 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:transform-none"
                     >
                       {isSubmitting ? (
-                        <div className="flex objects-center gap-2">
+                        <div className="flex items-center gap-2">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           Submitting...
                         </div>
                       ) : (
-                        <div className="flex objects-center gap-2">
+                        <div className="flex items-center gap-2">
                           <span>✍️</span>
                           Report Lost Object
                         </div>

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -153,31 +154,39 @@ const ReportFound = () => {
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
-                                <div className="relative">
-                                  <Button
-                                    variant="outline"
-                                    className={`w-full h-14 px-4 pt-6 pb-2 text-left font-normal border-2 rounded-xl bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gray-300 focus:border-mustard/60 ${
-                                      !field.value ? "text-gray-500" : "text-gray-900"
-                                    }`}
-                                  >
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  className={`w-full h-14 px-4 pt-6 pb-2 text-left font-normal border-2 rounded-xl bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gray-300 focus:border-mustard/60 ${
+                                    !field.value ? "text-gray-500" : "text-gray-900"
+                                  }`}
+                                >
+                                  <span className="flex-1">
                                     {field.value ? format(field.value, "PPP") : ""}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
+                                  </span>
+                                  <CalendarIcon className="h-4 w-4 opacity-50 ml-2" />
                                   <label className={`absolute left-4 transition-all duration-300 pointer-events-none ${
                                     field.value ? "top-2 text-xs font-medium text-mustard" : "top-1/2 transform -translate-y-1/2 text-base text-gray-500"
                                   }`}>
-                                    When did you find it? *
+                                    {field.value ? "When did you find it? *" : "Select date..."}
                                   </label>
-                                </div>
+                                </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 bg-white border shadow-lg z-50" align="start">
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 disabled={date => date > new Date() || date < new Date("1900-01-01")}
                                 initialFocus
+                                className="rounded-md border-0"
+                                classNames={{
+                                  day_selected: "bg-mustard text-white hover:bg-mustard hover:text-white focus:bg-mustard focus:text-white",
+                                  day_today: "bg-maroon/20 text-mustard font-bold",
+                                  nav_button: "hover:bg-mustard/10",
+                                  head_cell: "text-mustard font-medium"
+                                }}
                               />
                             </PopoverContent>
                           </Popover>
