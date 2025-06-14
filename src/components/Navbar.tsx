@@ -33,7 +33,10 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-maroon rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">G</span>
+            </div>
             <span className="font-bold text-xl text-maroon">G-Lost&Found</span>
           </Link>
 
