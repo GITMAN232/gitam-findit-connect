@@ -103,6 +103,13 @@ Bengaluru - 562110</span>
             </Link>
           </div>
         </div>
+        
+        {/* Credit Line */}
+        <div className="border-t border-grey/20 mt-4 pt-4 text-center">
+          <p className="text-gray-500 text-xs">
+            This website is designed and developed by Santhosh
+          </p>
+        </div>
       </div>
     </footer>
   );
