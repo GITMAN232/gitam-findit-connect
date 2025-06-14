@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { MapPin } from "lucide-react";
+import { MapPin, Compass } from "lucide-react";
 
 interface LoadingAnimationProps {
   onComplete: () => void;
@@ -10,21 +10,23 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
   const [progress, setProgress] = useState(0);
   const [currentPhase, setCurrentPhase] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [showFinalPulse, setShowFinalPulse] = useState(false);
+  const [showCompassGlow, setShowCompassGlow] = useState(false);
+  const [showPingEffect, setShowPingEffect] = useState(false);
+  const [showZoomTransition, setShowZoomTransition] = useState(false);
 
   const phases = [
-    "Initializing search protocol...",
-    "Scanning campus networks...",
-    "Analyzing lost item patterns...",
-    "Cross-referencing databases...",
-    "Detecting possible matches...",
-    "Almost there...",
-    "Found something!"
+    "Looking around campus...",
+    "Checking student lounges...",
+    "Scanning library areas...",
+    "Exploring cafeteria zones...",
+    "Found a clue!",
+    "Connecting the dots...",
+    "Redirecting you to the scene..."
   ];
 
   useEffect(() => {
-    const duration = 4000; // 4 seconds total animation
-    const interval = 60; // Update every 60ms for smoother animation
+    const duration = 4500; // 4.5 seconds total animation
+    const interval = 50; // Smoother 50ms updates
     const steps = duration / interval;
     const progressStep = 100 / steps;
 
@@ -36,15 +38,29 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
         const phaseIndex = Math.floor((newProgress / 100) * (phases.length - 1));
         setCurrentPhase(Math.min(phaseIndex, phases.length - 1));
         
+        // Trigger compass glow effect at 80%
+        if (newProgress >= 80 && !showCompassGlow) {
+          setShowCompassGlow(true);
+        }
+        
+        // Trigger ping effect when near completion
+        if (newProgress >= 95 && !showPingEffect) {
+          setShowPingEffect(true);
+        }
+        
         if (newProgress >= 100) {
           clearInterval(timer);
           setIsComplete(true);
-          setShowFinalPulse(true);
           
-          // Final magic fade transition
+          // Start zoom transition
+          setTimeout(() => {
+            setShowZoomTransition(true);
+          }, 300);
+          
+          // Complete transition to homepage
           setTimeout(() => {
             onComplete();
-          }, 1000);
+          }, 1200);
         }
         
         return Math.min(newProgress, 100);
@@ -52,176 +68,200 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [onComplete, phases.length]);
+  }, [onComplete, phases.length, showCompassGlow, showPingEffect]);
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-all duration-1000 px-4 overflow-hidden">
+    <div 
+      className={`fixed inset-0 bg-gradient-to-br from-white via-[#fdfdfd] to-gray-50 z-50 flex flex-col items-center justify-center transition-all duration-1000 px-4 overflow-hidden ${
+        showZoomTransition ? 'scale-110 opacity-0' : 'scale-100 opacity-100'
+      }`}
+    >
       
-      {/* Animated Background Waves */}
+      {/* Floating Background Gradients */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Maroon gradient blob */}
         <div 
-          className="absolute top-1/3 left-1/4 rounded-full bg-maroon/10 animate-pulse"
+          className="absolute rounded-full opacity-20 animate-pulse"
           style={{
-            width: `${120 + progress * 2}px`,
-            height: `${120 + progress * 2}px`,
-            animationDuration: '3s'
+            top: '20%',
+            left: '15%',
+            width: `${100 + progress * 0.8}px`,
+            height: `${100 + progress * 0.8}px`,
+            background: 'radial-gradient(circle, #7A121C 0%, transparent 70%)',
+            animationDuration: '4s'
           }}
         ></div>
+        
+        {/* Mustard gradient blob */}
         <div 
-          className="absolute bottom-1/3 right-1/4 rounded-full bg-mustard/10 animate-pulse"
+          className="absolute rounded-full opacity-15 animate-pulse"
           style={{
-            width: `${80 + progress * 1.5}px`,
-            height: `${80 + progress * 1.5}px`,
-            animationDuration: '2.5s',
-            animationDelay: '0.5s'
-          }}
-        ></div>
-        <div 
-          className="absolute top-1/2 right-1/6 rounded-full bg-maroon/5 animate-pulse"
-          style={{
-            width: `${60 + progress}px`,
-            height: `${60 + progress}px`,
-            animationDuration: '4s',
+            bottom: '25%',
+            right: '20%',
+            width: `${80 + progress * 0.6}px`,
+            height: `${80 + progress * 0.6}px`,
+            background: 'radial-gradient(circle, #D4AF37 0%, transparent 70%)',
+            animationDuration: '3.5s',
             animationDelay: '1s'
           }}
         ></div>
         
-        {/* Scanning Lines */}
-        <div className="absolute inset-0 opacity-20">
-          <div 
-            className="absolute h-px bg-gradient-to-r from-transparent via-mustard to-transparent animate-pulse"
-            style={{
-              top: '30%',
-              width: '100%',
-              animationDuration: '2s'
-            }}
-          ></div>
-          <div 
-            className="absolute h-px bg-gradient-to-r from-transparent via-maroon to-transparent animate-pulse"
-            style={{
-              top: '70%',
-              width: '100%',
-              animationDuration: '3s',
-              animationDelay: '1s'
-            }}
-          ></div>
-        </div>
+        {/* Additional floating gradient */}
+        <div 
+          className="absolute rounded-full opacity-10 animate-pulse"
+          style={{
+            top: '60%',
+            left: '70%',
+            width: `${60 + progress * 0.4}px`,
+            height: `${60 + progress * 0.4}px`,
+            background: 'radial-gradient(circle, #7A121C 0%, transparent 80%)',
+            animationDuration: '5s',
+            animationDelay: '0.5s'
+          }}
+        ></div>
       </div>
 
       {/* Animated Logo */}
-      <div className="mb-12 md:mb-16 z-10">
-        <div className="flex items-center gap-4 mb-3">
-          {/* Bouncing G Circle */}
+      <div className="mb-16 z-10">
+        <div className="flex items-center gap-6 mb-4">
+          {/* Bouncy G Circle */}
           <div 
-            className="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-maroon to-maroon/80 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-500"
+            className="relative w-20 h-20 bg-gradient-to-br from-maroon to-maroon/90 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-500"
             style={{
-              animation: 'bounce 2s infinite',
-              boxShadow: `0 0 ${20 + progress/5}px rgba(122, 18, 28, 0.5)`
+              animation: 'bounceFloat 3s ease-in-out infinite',
+              boxShadow: `0 10px 30px rgba(122, 18, 28, 0.3), 0 0 ${15 + progress/8}px rgba(122, 18, 28, 0.4)`
             }}
           >
-            <span className="text-white font-bold text-2xl md:text-3xl">G</span>
-            <div className="absolute inset-0 rounded-full bg-white/20 animate-ping"></div>
+            <span className="text-white font-bold text-3xl tracking-tight">G</span>
+            <div className="absolute inset-0 rounded-full bg-white/10 animate-pulse"></div>
+            
+            {/* Orbital ring */}
+            <div 
+              className="absolute inset-0 rounded-full border-2 border-mustard/30 animate-spin"
+              style={{ animationDuration: '8s' }}
+            ></div>
           </div>
           
-          {/* Animated Text Logo */}
+          {/* Futuristic Text Logo */}
           <div className="relative">
             <h1 
-              className="font-bold text-2xl md:text-3xl lg:text-4xl text-maroon tracking-wide"
+              className="font-bold text-4xl lg:text-5xl text-maroon tracking-wide"
               style={{
-                textShadow: '0 0 20px rgba(122, 18, 28, 0.3)',
-                animation: 'fadeInScale 1s ease-out 0.5s both'
+                fontFamily: '"Segoe UI", "Helvetica Neue", Arial, sans-serif',
+                textShadow: '0 0 20px rgba(122, 18, 28, 0.2)',
+                animation: 'textSlideIn 1.2s ease-out 0.3s both'
               }}
             >
               <span className="text-maroon">G-Lost</span>
-              <span className="text-mustard mx-1">&</span>
+              <span className="text-mustard mx-2">&</span>
               <span className="text-maroon">Found</span>
             </h1>
-            <div className="absolute -inset-1 bg-gradient-to-r from-maroon/20 to-mustard/20 rounded blur opacity-30"></div>
+            
+            {/* Underline accent */}
+            <div 
+              className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-maroon via-mustard to-maroon rounded-full"
+              style={{
+                width: `${progress}%`,
+                transition: 'width 0.1s ease-out'
+              }}
+            ></div>
           </div>
         </div>
         
         <p 
-          className="text-gray-600 text-center text-sm md:text-base tracking-wide"
+          className="text-gray-500 text-center text-lg tracking-wide font-medium"
           style={{
-            animation: 'fadeInUp 1s ease-out 1s both'
+            animation: 'fadeInUp 1s ease-out 0.8s both'
           }}
         >
-          Advanced Item Recovery System
+          Campus Item Recovery System
         </p>
       </div>
 
       {/* Main Animation Container */}
-      <div className="relative w-80 md:w-96 mb-8 md:mb-12 z-10">
-        {/* Glowing Progress Bar Container */}
-        <div className="relative w-full h-3 md:h-4 bg-gray-200 rounded-full mb-8 md:mb-12 overflow-hidden backdrop-blur-sm border border-gray-300">
-          {/* Progress Bar with Glow */}
+      <div className="relative w-96 md:w-[450px] mb-12 z-10">
+        {/* Modern Progress Bar Container */}
+        <div className="relative w-full h-4 bg-gray-100 rounded-full mb-16 overflow-hidden shadow-inner border border-gray-200/50">
+          {/* Glowing Progress Bar */}
           <div 
-            className="h-full bg-gradient-to-r from-maroon via-mustard to-maroon rounded-full transition-all duration-100 ease-out relative"
+            className="h-full bg-gradient-to-r from-maroon via-mustard to-maroon rounded-full transition-all duration-75 ease-out relative overflow-hidden"
             style={{ 
               width: `${progress}%`,
-              boxShadow: `0 0 ${10 + progress/10}px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255,255,255,0.2)`
+              boxShadow: `0 0 ${8 + progress/12}px rgba(212, 175, 55, 0.6), inset 0 1px 0 rgba(255,255,255,0.3)`
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full"></div>
-            <div className="absolute inset-0 bg-white/10 animate-pulse rounded-full"></div>
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+            
+            {/* Flowing light effect */}
+            <div 
+              className="absolute top-0 h-full w-12 bg-gradient-to-r from-transparent via-white/40 to-transparent transform -skew-x-12 transition-all duration-75"
+              style={{ 
+                left: `${Math.max(0, progress - 12)}%`,
+                opacity: progress > 8 ? 0.8 : 0,
+                animation: progress > 50 ? 'flowingLight 2s ease-in-out infinite' : 'none'
+              }}
+            ></div>
           </div>
-          
-          {/* Scanning Light Effect */}
-          <div 
-            className="absolute top-0 h-full w-8 bg-gradient-to-r from-transparent via-white/40 to-transparent rounded-full transform -skew-x-12 transition-all duration-100"
-            style={{ 
-              left: `${Math.max(0, progress - 8)}%`,
-              opacity: progress > 5 ? 1 : 0
-            }}
-          ></div>
         </div>
 
         {/* Animation Icons Container */}
-        <div className="relative w-full h-12 md:h-16 flex items-center">
-          {/* Magnifying Glass Animation */}
+        <div className="relative w-full h-20 flex items-center">
+          {/* Animated Compass */}
           <div 
-            className="absolute transition-all duration-100 ease-out z-20"
+            className="absolute transition-all duration-75 ease-out z-20"
             style={{ 
-              left: `${Math.min(progress, 92)}%`, 
+              left: `${Math.min(progress, 90)}%`, 
               transform: 'translateX(-50%)',
-              filter: `drop-shadow(0 0 ${8 + progress/12}px rgba(212, 175, 55, 0.8))`
             }}
           >
-            <div 
-              className="text-3xl md:text-4xl transform transition-all duration-300 relative"
-              style={{ 
-                transform: `translateX(-50%) scale(${1 + (progress/200)}) ${progress >= 95 ? 'rotate(360deg)' : ''}`,
-                animation: progress >= 95 ? 'spin 0.5s ease-out' : 'none'
-              }}
-            >
-              🔍
-              {progress > 50 && (
-                <div className="absolute inset-0 animate-ping text-3xl md:text-4xl opacity-30">🔍</div>
+            <div className="relative">
+              <Compass 
+                className={`w-12 h-12 text-maroon transition-all duration-300 ${
+                  showCompassGlow ? 'scale-125 animate-pulse' : 'scale-100'
+                }`}
+                style={{
+                  filter: showCompassGlow 
+                    ? 'drop-shadow(0 0 15px rgba(122, 18, 28, 0.8)) drop-shadow(0 0 25px rgba(212, 175, 55, 0.6))'
+                    : 'drop-shadow(0 0 8px rgba(122, 18, 28, 0.4))',
+                  transform: `translateX(-50%) rotate(${progress * 3.6}deg) ${showCompassGlow ? 'scale(1.25)' : 'scale(1)'}`
+                }}
+              />
+              
+              {/* Compass glow rings */}
+              {showCompassGlow && (
+                <>
+                  <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-maroon/30 animate-ping"></div>
+                  <div className="absolute inset-0 w-12 h-12 rounded-full border border-mustard/40 animate-ping" style={{ animationDelay: '0.2s' }}></div>
+                </>
               )}
             </div>
           </div>
 
-          {/* Location Pin with Ripple Effect */}
+          {/* MapPin with Enhanced Ping Effect */}
           <div 
             className="absolute right-0 flex items-center justify-center"
             style={{ transform: 'translateX(50%)' }}
           >
             <div className="relative">
               <MapPin 
-                className={`w-8 h-8 md:w-10 md:h-10 text-mustard transition-all duration-500 z-10 relative ${
-                  showFinalPulse ? 'scale-150 animate-bounce' : 'scale-100'
+                className={`w-14 h-14 text-mustard transition-all duration-500 z-10 relative ${
+                  showPingEffect ? 'scale-150' : 'scale-100'
                 }`}
                 style={{
-                  filter: `drop-shadow(0 0 ${showFinalPulse ? '20' : '8'}px rgba(212, 175, 55, 0.8))`,
-                  animation: showFinalPulse ? 'glow 1s ease-in-out infinite alternate' : 'none'
+                  filter: showPingEffect 
+                    ? 'drop-shadow(0 0 20px rgba(212, 175, 55, 1)) drop-shadow(0 0 30px rgba(122, 18, 28, 0.6))'
+                    : 'drop-shadow(0 0 8px rgba(212, 175, 55, 0.5))',
+                  animation: showPingEffect ? 'mapPinPulse 1s ease-in-out infinite' : 'none'
                 }}
               />
               
-              {/* Ripple Effects */}
-              {showFinalPulse && (
+              {/* Enhanced ping effects */}
+              {showPingEffect && (
                 <>
-                  <div className="absolute inset-0 w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-mustard/50 animate-ping"></div>
-                  <div className="absolute inset-0 w-8 h-8 md:w-10 md:h-10 rounded-full border border-mustard/30 animate-ping animation-delay-300"></div>
+                  <div className="absolute inset-0 w-14 h-14 rounded-full border-4 border-mustard/50 animate-ping"></div>
+                  <div className="absolute inset-0 w-14 h-14 rounded-full border-2 border-maroon/40 animate-ping" style={{ animationDelay: '0.3s' }}></div>
+                  <div className="absolute inset-0 w-14 h-14 rounded-full bg-mustard/20 animate-ping" style={{ animationDelay: '0.1s' }}></div>
                 </>
               )}
             </div>
@@ -230,27 +270,31 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
       </div>
 
       {/* Dynamic Status Text */}
-      <div className="text-center z-10 min-h-[80px] flex flex-col justify-center">
+      <div className="text-center z-10 min-h-[120px] flex flex-col justify-center">
         <div 
-          className="text-lg md:text-xl font-semibold text-maroon mb-3 transition-all duration-500"
+          className="text-xl md:text-2xl font-semibold text-maroon mb-4 transition-all duration-500"
           style={{
-            textShadow: '0 0 10px rgba(122, 18, 28, 0.3)',
-            animation: 'textGlow 2s ease-in-out infinite alternate'
+            fontFamily: '"SF Pro Display", "Helvetica Neue", Arial, sans-serif',
+            textShadow: '0 0 15px rgba(122, 18, 28, 0.2)',
+            animation: 'textGlow 2.5s ease-in-out infinite alternate'
           }}
         >
           {phases[currentPhase]}
         </div>
         
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <div className="text-sm md:text-base text-gray-600 font-mono">
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="text-base text-gray-500 font-medium">
             {Math.round(progress)}% complete
           </div>
           <div className="flex gap-1">
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="w-1 h-1 bg-mustard rounded-full animate-pulse"
-                style={{ animationDelay: `${i * 0.2}s` }}
+                className="w-2 h-2 bg-mustard rounded-full animate-pulse"
+                style={{ 
+                  animationDelay: `${i * 0.3}s`,
+                  animationDuration: '1.5s'
+                }}
               ></div>
             ))}
           </div>
@@ -258,35 +302,52 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
         
         {isComplete && (
           <div 
-            className="text-green-600 font-semibold text-base md:text-lg"
+            className="text-green-600 font-bold text-lg flex items-center justify-center gap-2"
             style={{
-              animation: 'fadeInScale 0.5s ease-out',
-              textShadow: '0 0 10px rgba(34, 197, 94, 0.5)'
+              animation: 'celebrationPop 0.6s ease-out',
+              textShadow: '0 0 15px rgba(34, 197, 94, 0.4)'
             }}
           >
-            ✨ Connection Established ✨
+            <span className="animate-spin">🎯</span>
+            <span>Found your destination!</span>
+            <span className="animate-bounce">✨</span>
           </div>
         )}
       </div>
 
-      {/* Custom Keyframes via Style Tag */}
+      {/* Enhanced Custom Keyframes */}
       <style>
         {`
-        @keyframes fadeInScale {
+        @keyframes bounceFloat {
+          0%, 100% {
+            transform: translateY(0px) scale(1);
+          }
+          25% {
+            transform: translateY(-8px) scale(1.05);
+          }
+          50% {
+            transform: translateY(0px) scale(1);
+          }
+          75% {
+            transform: translateY(-4px) scale(1.02);
+          }
+        }
+        
+        @keyframes textSlideIn {
           from {
             opacity: 0;
-            transform: scale(0.9) translateY(10px);
+            transform: translateX(-30px) scale(0.95);
           }
           to {
             opacity: 1;
-            transform: scale(1) translateY(0);
+            transform: translateX(0) scale(1);
           }
         }
         
         @keyframes fadeInUp {
           from {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(25px);
           }
           to {
             opacity: 1;
@@ -296,19 +357,47 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
         
         @keyframes textGlow {
           from {
-            text-shadow: 0 0 10px rgba(122, 18, 28, 0.3);
+            text-shadow: 0 0 15px rgba(122, 18, 28, 0.2);
           }
           to {
-            text-shadow: 0 0 20px rgba(122, 18, 28, 0.6), 0 0 30px rgba(212, 175, 55, 0.3);
+            text-shadow: 0 0 25px rgba(122, 18, 28, 0.4), 0 0 35px rgba(212, 175, 55, 0.3);
           }
         }
         
-        @keyframes glow {
-          from {
-            filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.8));
+        @keyframes flowingLight {
+          0% {
+            transform: translateX(-100%) skewX(-12deg);
+            opacity: 0;
           }
-          to {
-            filter: drop-shadow(0 0 25px rgba(212, 175, 55, 1)) drop-shadow(0 0 35px rgba(122, 18, 28, 0.6));
+          50% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(300%) skewX(-12deg);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes mapPinPulse {
+          0%, 100% {
+            transform: scale(1.5);
+          }
+          50% {
+            transform: scale(1.7);
+          }
+        }
+        
+        @keyframes celebrationPop {
+          0% {
+            opacity: 0;
+            transform: scale(0.8) translateY(10px);
+          }
+          50% {
+            transform: scale(1.1) translateY(-5px);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
           }
         }
         `}
