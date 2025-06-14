@@ -112,7 +112,7 @@ const ReportFound = () => {
             <div className="max-w-4xl mx-auto">
               {/* Hero Section */}
               <div className="text-center mb-12 space-y-4">
-                <div className="inline-flex objects-center gap-2 bg-mustard/10 text-mustard px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <div className="inline-flex items-center gap-2 bg-mustard/10 text-mustard px-4 py-2 rounded-full text-sm font-medium mb-4">
                   <span>👀</span>
                   Found Something?
                 </div>
@@ -128,8 +128,8 @@ const ReportFound = () => {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                   {/* Object Details Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex objects-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-mustard/10 rounded-xl flex objects-center justify-center">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-mustard/10 rounded-xl flex items-center justify-center">
                         <span className="text-lg">🧾</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Object Details</h2>
@@ -205,8 +205,8 @@ const ReportFound = () => {
 
                   {/* Location Info Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex objects-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-green-500/10 rounded-xl flex objects-center justify-center">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
                         <span className="text-lg">📍</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Location Info</h2>
@@ -231,8 +231,8 @@ const ReportFound = () => {
 
                   {/* Contact Info Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex objects-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex objects-center justify-center">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
                         <span className="text-lg">📞</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Contact Info</h2>
@@ -258,7 +258,7 @@ const ReportFound = () => {
                       
                       <FormField control={form.control} name="phone" render={({ field }) => (
                         <FormItem>
-                          <Form Control>
+                          <FormControl>
                             <div className="relative">
                               <FloatingInput
                                 label="WhatsApp number (optional)"
@@ -284,8 +284,8 @@ const ReportFound = () => {
 
                   {/* Image Upload Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex objects-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex objects-center justify-center">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center">
                         <span className="text-lg">📸</span>
                       </div>
                       <div className="flex-1">
@@ -316,12 +316,12 @@ const ReportFound = () => {
                       className="bg-mustard hover:bg-maroon text-white font-semibold py-4 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:transform-none"
                     >
                       {isSubmitting ? (
-                        <div className="flex objects-center gap-2">
+                        <div className="flex items-center gap-2">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           Submitting...
                         </div>
                       ) : (
-                        <div className="flex objects-center gap-2">
+                        <div className="flex items-center gap-2">
                           <span>✍️</span>
                           Report Found Object
                         </div>
