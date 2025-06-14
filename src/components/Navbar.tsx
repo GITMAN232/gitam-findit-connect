@@ -31,7 +31,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 bg-maroon rounded-full flex items-center justify-center">
@@ -40,7 +40,10 @@ const Navbar = () => {
             <span className="font-bold text-xl text-maroon">G-Lost&Found</span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Spacer to push navigation to the right */}
+          <div className="flex-1"></div>
+
+          {/* Desktop Navigation - moved to the right */}
           <div className="hidden md:flex items-center space-x-8">
             <Link 
               to="/" 
@@ -75,10 +78,8 @@ const Navbar = () => {
                 My Reports
               </Link>
             )}
-          </div>
 
-          {/* Right side actions */}
-          <div className="flex items-center gap-3">
+            {/* User actions */}
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -115,47 +116,47 @@ const Navbar = () => {
                 <Link to="/auth">Sign In</Link>
               </Button>
             )}
+          </div>
 
-            {/* Mobile menu */}
-            <div className="md:hidden">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white">
+          {/* Mobile menu */}
+          <div className="md:hidden ml-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-white">
+                <DropdownMenuItem asChild>
+                  <Link to="/" className="w-full">Home</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/report-lost" className="w-full">Report Lost</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/report-found" className="w-full">Report Found</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/listings" className="w-full">View Listings</Link>
+                </DropdownMenuItem>
+                {user && (
                   <DropdownMenuItem asChild>
-                    <Link to="/" className="w-full">Home</Link>
+                    <Link to="/my-reportings" className="w-full">My Reports</Link>
                   </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                {user ? (
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                ) : (
                   <DropdownMenuItem asChild>
-                    <Link to="/report-lost" className="w-full">Report Lost</Link>
+                    <Link to="/auth" className="w-full">Sign In</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/report-found" className="w-full">Report Found</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/listings" className="w-full">View Listings</Link>
-                  </DropdownMenuItem>
-                  {user && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/my-reportings" className="w-full">My Reports</Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  {user ? (
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign out
-                    </DropdownMenuItem>
-                  ) : (
-                    <DropdownMenuItem asChild>
-                      <Link to="/auth" className="w-full">Sign In</Link>
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
