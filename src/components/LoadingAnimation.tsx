@@ -13,6 +13,9 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
   const [showCompassGlow, setShowCompassGlow] = useState(false);
   const [showPingEffect, setShowPingEffect] = useState(false);
   const [showZoomTransition, setShowZoomTransition] = useState(false);
+  const [showMergeAnimation, setShowMergeAnimation] = useState(false);
+  const [showBullseyeBurst, setShowBullseyeBurst] = useState(false);
+  const [showSparkles, setShowSparkles] = useState(false);
 
   const phases = [
     "Looking around campus...",
@@ -43,6 +46,17 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
           setShowCompassGlow(true);
         }
         
+        // Trigger merge animation when compass reaches the pin (90%)
+        if (newProgress >= 90 && !showMergeAnimation) {
+          setShowMergeAnimation(true);
+          
+          // Sequence the merge effects
+          setTimeout(() => {
+            setShowBullseyeBurst(true);
+            setShowSparkles(true);
+          }, 200);
+        }
+        
         // Trigger ping effect when near completion
         if (newProgress >= 95 && !showPingEffect) {
           setShowPingEffect(true);
@@ -68,7 +82,7 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [onComplete, phases.length, showCompassGlow, showPingEffect]);
+  }, [onComplete, phases.length, showCompassGlow, showPingEffect, showMergeAnimation]);
 
   return (
     <div 
@@ -207,12 +221,33 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
 
         {/* Animation Icons Container */}
         <div className="relative w-full h-20 flex items-center">
+          {/* Sparkle Effects */}
+          {showSparkles && (
+            <div className="absolute inset-0 pointer-events-none">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-2 h-2 bg-mustard rounded-full animate-ping"
+                  style={{
+                    left: `${45 + Math.sin(i * 45 * Math.PI / 180) * 30}%`,
+                    top: `${50 + Math.cos(i * 45 * Math.PI / 180) * 30}%`,
+                    animationDelay: `${i * 0.1}s`,
+                    animationDuration: '1.5s'
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
           {/* Animated Compass */}
           <div 
-            className="absolute transition-all duration-75 ease-out z-20"
+            className={`absolute transition-all duration-75 ease-out z-20 ${
+              showMergeAnimation ? 'animate-bounce' : ''
+            }`}
             style={{ 
               left: `${Math.min(progress, 90)}%`, 
-              transform: 'translateX(-50%)',
+              transform: `translateX(-50%) ${showMergeAnimation ? 'scale(1.2)' : 'scale(1)'}`,
+              transition: showMergeAnimation ? 'all 0.3s ease-out' : 'all 75ms ease-out'
             }}
           >
             <div className="relative">
@@ -238,10 +273,57 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
             </div>
           </div>
 
+          {/* Bullseye Burst Animation */}
+          {showBullseyeBurst && (
+            <div 
+              className="absolute z-30 flex items-center justify-center"
+              style={{ 
+                left: '50%', 
+                top: '50%',
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              <div className="relative">
+                {/* Main bullseye emoji */}
+                <div 
+                  className="text-6xl animate-bounce"
+                  style={{
+                    animation: 'bullseyeBurst 1s ease-out',
+                    filter: 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.8))'
+                  }}
+                >
+                  🎯
+                </div>
+                
+                {/* Glowing pulse rings */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-full border-4 border-mustard/50 animate-ping"></div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div 
+                    className="w-24 h-24 rounded-full border-2 border-maroon/40 animate-ping"
+                    style={{ animationDelay: '0.2s' }}
+                  ></div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div 
+                    className="w-28 h-28 rounded-full bg-gradient-to-r from-maroon/20 to-mustard/20 animate-ping"
+                    style={{ animationDelay: '0.4s' }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* MapPin with Enhanced Ping Effect */}
           <div 
-            className="absolute right-0 flex items-center justify-center"
-            style={{ transform: 'translateX(50%)' }}
+            className={`absolute right-0 flex items-center justify-center ${
+              showMergeAnimation ? 'animate-bounce' : ''
+            }`}
+            style={{ 
+              transform: `translateX(50%) ${showMergeAnimation ? 'scale(1.2)' : 'scale(1)'}`,
+              transition: showMergeAnimation ? 'all 0.3s ease-out' : 'none'
+            }}
           >
             <div className="relative">
               <MapPin 
@@ -398,6 +480,21 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
           100% {
             opacity: 1;
             transform: scale(1) translateY(0);
+          }
+        }
+        
+        @keyframes bullseyeBurst {
+          0% {
+            opacity: 0;
+            transform: scale(0.3) rotate(-180deg);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.3) rotate(0deg);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
           }
         }
         `}
