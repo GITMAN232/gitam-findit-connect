@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -172,7 +171,7 @@ const ReportFound = () => {
                                 </div>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 bg-white z-50" align="start">
+                            <PopoverContent className="w-auto p-0 bg-white border shadow-lg z-50" align="start">
                               <Calendar
                                 mode="single"
                                 selected={field.value}
