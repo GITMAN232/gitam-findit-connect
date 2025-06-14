@@ -55,7 +55,7 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
   }, [onComplete, phases.length]);
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-maroon/20 z-50 flex flex-col items-center justify-center transition-all duration-1000 px-4 overflow-hidden">
+    <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-all duration-1000 px-4 overflow-hidden">
       
       {/* Animated Background Waves */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -126,22 +126,22 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
           {/* Animated Text Logo */}
           <div className="relative">
             <h1 
-              className="font-bold text-2xl md:text-3xl lg:text-4xl text-white tracking-wide"
+              className="font-bold text-2xl md:text-3xl lg:text-4xl text-maroon tracking-wide"
               style={{
-                textShadow: '0 0 20px rgba(255,255,255,0.3)',
+                textShadow: '0 0 20px rgba(122, 18, 28, 0.3)',
                 animation: 'fadeInScale 1s ease-out 0.5s both'
               }}
             >
-              <span className="text-white">G-Lost</span>
+              <span className="text-maroon">G-Lost</span>
               <span className="text-mustard mx-1">&</span>
-              <span className="text-white">Found</span>
+              <span className="text-maroon">Found</span>
             </h1>
             <div className="absolute -inset-1 bg-gradient-to-r from-maroon/20 to-mustard/20 rounded blur opacity-30"></div>
           </div>
         </div>
         
         <p 
-          className="text-gray-300 text-center text-sm md:text-base tracking-wide"
+          className="text-gray-600 text-center text-sm md:text-base tracking-wide"
           style={{
             animation: 'fadeInUp 1s ease-out 1s both'
           }}
@@ -153,7 +153,7 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
       {/* Main Animation Container */}
       <div className="relative w-80 md:w-96 mb-8 md:mb-12 z-10">
         {/* Glowing Progress Bar Container */}
-        <div className="relative w-full h-3 md:h-4 bg-slate-700/50 rounded-full mb-8 md:mb-12 overflow-hidden backdrop-blur-sm border border-slate-600/30">
+        <div className="relative w-full h-3 md:h-4 bg-gray-200 rounded-full mb-8 md:mb-12 overflow-hidden backdrop-blur-sm border border-gray-300">
           {/* Progress Bar with Glow */}
           <div 
             className="h-full bg-gradient-to-r from-maroon via-mustard to-maroon rounded-full transition-all duration-100 ease-out relative"
@@ -232,9 +232,9 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
       {/* Dynamic Status Text */}
       <div className="text-center z-10 min-h-[80px] flex flex-col justify-center">
         <div 
-          className="text-lg md:text-xl font-semibold text-white mb-3 transition-all duration-500"
+          className="text-lg md:text-xl font-semibold text-maroon mb-3 transition-all duration-500"
           style={{
-            textShadow: '0 0 10px rgba(255,255,255,0.3)',
+            textShadow: '0 0 10px rgba(122, 18, 28, 0.3)',
             animation: 'textGlow 2s ease-in-out infinite alternate'
           }}
         >
@@ -242,7 +242,7 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
         </div>
         
         <div className="flex items-center justify-center gap-2 mb-2">
-          <div className="text-sm md:text-base text-gray-300 font-mono">
+          <div className="text-sm md:text-base text-gray-600 font-mono">
             {Math.round(progress)}% complete
           </div>
           <div className="flex gap-1">
@@ -258,7 +258,7 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
         
         {isComplete && (
           <div 
-            className="text-green-400 font-semibold text-base md:text-lg"
+            className="text-green-600 font-semibold text-base md:text-lg"
             style={{
               animation: 'fadeInScale 0.5s ease-out',
               textShadow: '0 0 10px rgba(34, 197, 94, 0.5)'
@@ -270,7 +270,8 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
       </div>
 
       {/* Custom Keyframes via Style Tag */}
-      <style jsx>{`
+      <style>
+        {`
         @keyframes fadeInScale {
           from {
             opacity: 0;
@@ -295,10 +296,10 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
         
         @keyframes textGlow {
           from {
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            text-shadow: 0 0 10px rgba(122, 18, 28, 0.3);
           }
           to {
-            text-shadow: 0 0 20px rgba(255,255,255,0.6), 0 0 30px rgba(212, 175, 55, 0.3);
+            text-shadow: 0 0 20px rgba(122, 18, 28, 0.6), 0 0 30px rgba(212, 175, 55, 0.3);
           }
         }
         
@@ -310,7 +311,8 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
             filter: drop-shadow(0 0 25px rgba(212, 175, 55, 1)) drop-shadow(0 0 35px rgba(122, 18, 28, 0.6));
           }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
