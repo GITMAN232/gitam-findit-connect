@@ -119,7 +119,7 @@ const EditReportDialog = ({ item, open, onOpenChange, onSuccess }: EditReportDia
 
       toast({
         title: "Report updated",
-        description: `Your ${item.type} item report has been updated successfully.`,
+        description: `Your ${item.type} object report has been updated successfully.`,
       });
 
       onSuccess();
@@ -149,7 +149,7 @@ const EditReportDialog = ({ item, open, onOpenChange, onSuccess }: EditReportDia
       <DialogContent className="max-w-2xl overflow-auto max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>
-            Edit {item.type === 'lost' ? 'Lost' : 'Found'} Item Report
+            Edit {item.type === 'lost' ? 'Lost' : 'Found'} Object Report
           </DialogTitle>
         </DialogHeader>
 

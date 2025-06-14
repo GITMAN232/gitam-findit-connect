@@ -71,7 +71,7 @@ const ReportLost = () => {
 
       toast({
         title: "✨ Report submitted successfully!",
-        description: "We'll help you find your item. Keep an eye on the listings!"
+        description: "We'll help you find your object. Keep an eye on the listings!"
       });
 
       navigate("/listings");
@@ -111,7 +111,7 @@ const ReportLost = () => {
             <div className="max-w-4xl mx-auto">
               {/* Hero Section */}
               <div className="text-center mb-12 space-y-4">
-                <div className="inline-flex items-center gap-2 bg-maroon/10 text-maroon px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <div className="inline-flex objects-center gap-2 bg-maroon/10 text-maroon px-4 py-2 rounded-full text-sm font-medium mb-4">
                   <span>🔍</span>
                   Lost Something?
                 </div>
@@ -119,19 +119,19 @@ const ReportLost = () => {
                   Let's help you find it faster!
                 </h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  Fill out the details below and our community will help you track down your missing item.
+                  Fill out the details below and our community will help you track down your missing object.
                 </p>
               </div>
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                  {/* Item Details Card */}
+                  {/* Object Details Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-maroon/10 rounded-xl flex items-center justify-center">
+                    <div className="flex objects-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-maroon/10 rounded-xl flex objects-center justify-center">
                         <span className="text-lg">🧾</span>
                       </div>
-                      <h2 className="text-2xl font-bold text-gray-800">Item Details</h2>
+                      <h2 className="text-2xl font-bold text-gray-800">Object Details</h2>
                     </div>
                     
                     <div className="grid md:grid-cols-2 gap-6">
@@ -171,12 +171,13 @@ const ReportLost = () => {
                                 </div>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
+                            <PopoverContent className="w-auto p-0 bg-white z-50" align="start">
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 disabled={date => date > new Date() || date < new Date("1900-01-01")}
+                                initialFocus
                               />
                             </PopoverContent>
                           </Popover>
@@ -190,7 +191,7 @@ const ReportLost = () => {
                         <FormItem>
                           <FormControl>
                             <FloatingTextarea
-                              label="Describe your item in detail (color, brand, size, etc.) *"
+                              label="Describe your object in detail (color, brand, size, etc.) *"
                               error={fieldState.error?.message}
                               {...field}
                             />
@@ -203,8 +204,8 @@ const ReportLost = () => {
 
                   {/* Location Info Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-mustard/10 rounded-xl flex items-center justify-center">
+                    <div className="flex objects-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-mustard/10 rounded-xl flex objects-center justify-center">
                         <span className="text-lg">📍</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Location Info</h2>
@@ -229,8 +230,8 @@ const ReportLost = () => {
 
                   {/* Contact Info Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
+                    <div className="flex objects-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-green-500/10 rounded-xl flex objects-center justify-center">
                         <span className="text-lg">📞</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Contact Info</h2>
@@ -282,20 +283,20 @@ const ReportLost = () => {
 
                   {/* Image Upload Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                    <div className="flex objects-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex objects-center justify-center">
                         <span className="text-lg">📸</span>
                       </div>
                       <div className="flex-1">
                         <h2 className="text-2xl font-bold text-gray-800">Add a Photo</h2>
-                        <p className="text-gray-600">A picture helps others recognize your item</p>
+                        <p className="text-gray-600">A picture helps others recognize your object</p>
                       </div>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Info className="text-gray-400 h-5 w-5 cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Adding a photo increases your chances of finding your item!</p>
+                          <p>Adding a photo increases your chances of finding your object!</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -314,14 +315,14 @@ const ReportLost = () => {
                       className="bg-maroon hover:bg-mustard text-white font-semibold py-4 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:transform-none"
                     >
                       {isSubmitting ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex objects-center gap-2">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           Submitting...
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2">
+                        <div className="flex objects-center gap-2">
                           <span>✍️</span>
-                          Report Lost Item
+                          Report Lost Object
                         </div>
                       )}
                     </Button>

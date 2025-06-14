@@ -72,7 +72,7 @@ const ReportFound = () => {
 
       toast({
         title: "🎉 Thank you for reporting!",
-        description: "Your found item has been posted. Someone will be very grateful!"
+        description: "Your found object has been posted. Someone will be very grateful!"
       });
 
       navigate("/listings");
@@ -112,7 +112,7 @@ const ReportFound = () => {
             <div className="max-w-4xl mx-auto">
               {/* Hero Section */}
               <div className="text-center mb-12 space-y-4">
-                <div className="inline-flex items-center gap-2 bg-mustard/10 text-mustard px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <div className="inline-flex objects-center gap-2 bg-mustard/10 text-mustard px-4 py-2 rounded-full text-sm font-medium mb-4">
                   <span>👀</span>
                   Found Something?
                 </div>
@@ -120,19 +120,19 @@ const ReportFound = () => {
                   Spot it? Report it!
                 </h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  Help reunite someone with their lost item by reporting what you found.
+                  Help reunite someone with their lost object by reporting what you found.
                 </p>
               </div>
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                  {/* Item Details Card */}
+                  {/* Object Details Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-mustard/10 rounded-xl flex items-center justify-center">
+                    <div className="flex objects-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-mustard/10 rounded-xl flex objects-center justify-center">
                         <span className="text-lg">🧾</span>
                       </div>
-                      <h2 className="text-2xl font-bold text-gray-800">Item Details</h2>
+                      <h2 className="text-2xl font-bold text-gray-800">Object Details</h2>
                     </div>
                     
                     <div className="grid md:grid-cols-2 gap-6">
@@ -172,12 +172,13 @@ const ReportFound = () => {
                                 </div>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
+                            <PopoverContent className="w-auto p-0 bg-white z-50" align="start">
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 disabled={date => date > new Date() || date < new Date("1900-01-01")}
+                                initialFocus
                               />
                             </PopoverContent>
                           </Popover>
@@ -191,7 +192,7 @@ const ReportFound = () => {
                         <FormItem>
                           <FormControl>
                             <FloatingTextarea
-                              label="Describe the item in detail (color, brand, size, etc.) *"
+                              label="Describe the object in detail (color, brand, size, etc.) *"
                               error={fieldState.error?.message}
                               {...field}
                             />
@@ -204,8 +205,8 @@ const ReportFound = () => {
 
                   {/* Location Info Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
+                    <div className="flex objects-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-green-500/10 rounded-xl flex objects-center justify-center">
                         <span className="text-lg">📍</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Location Info</h2>
@@ -230,8 +231,8 @@ const ReportFound = () => {
 
                   {/* Contact Info Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                    <div className="flex objects-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex objects-center justify-center">
                         <span className="text-lg">📞</span>
                       </div>
                       <h2 className="text-2xl font-bold text-gray-800">Contact Info</h2>
@@ -257,7 +258,7 @@ const ReportFound = () => {
                       
                       <FormField control={form.control} name="phone" render={({ field }) => (
                         <FormItem>
-                          <FormControl>
+                          <Form Control>
                             <div className="relative">
                               <FloatingInput
                                 label="WhatsApp number (optional)"
@@ -283,20 +284,20 @@ const ReportFound = () => {
 
                   {/* Image Upload Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center">
+                    <div className="flex objects-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex objects-center justify-center">
                         <span className="text-lg">📸</span>
                       </div>
                       <div className="flex-1">
                         <h2 className="text-2xl font-bold text-gray-800">Add a Photo</h2>
-                        <p className="text-gray-600">Help the owner identify their item</p>
+                        <p className="text-gray-600">Help the owner identify their object</p>
                       </div>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Info className="text-gray-400 h-5 w-5 cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>A photo helps owners verify this is their lost item!</p>
+                          <p>A photo helps owners verify this is their lost object!</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -315,14 +316,14 @@ const ReportFound = () => {
                       className="bg-mustard hover:bg-maroon text-white font-semibold py-4 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:transform-none"
                     >
                       {isSubmitting ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex objects-center gap-2">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           Submitting...
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2">
+                        <div className="flex objects-center gap-2">
                           <span>✍️</span>
-                          Report Found Item
+                          Report Found Object
                         </div>
                       )}
                     </Button>
