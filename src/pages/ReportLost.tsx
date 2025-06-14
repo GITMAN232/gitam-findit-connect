@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, MapPin, Image, Mail, MessageCircle, Star } from "lucide-react";
+import { CalendarIcon, MapPin, Mail, MessageCircle, Star, Info } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -10,29 +11,21 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { createLostObject, uploadImage } from "@/services/supabaseApi";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { FloatingInput } from "@/components/ui/floating-input";
+import { FloatingTextarea } from "@/components/ui/floating-textarea";
+import { DragDropImage } from "@/components/ui/drag-drop-image";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const formSchema = z.object({
-  objectName: z.string().min(2, {
-    message: "Object name must be at least 2 characters."
-  }),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters."
-  }),
-  location: z.string().min(2, {
-    message: "Location is required."
-  }),
-  lostDate: z.date({
-    required_error: "Please select a date when the object was lost."
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address."
-  }),
+  objectName: z.string().min(2, "Object name must be at least 2 characters."),
+  description: z.string().min(10, "Description must be at least 10 characters."),
+  location: z.string().min(2, "Location is required."),
+  lostDate: z.date({ required_error: "Please select a date when the object was lost." }),
+  email: z.string().email("Please enter a valid email address."),
   phone: z.string().optional(),
   imageFile: z.instanceof(FileList).optional()
 });
@@ -62,13 +55,11 @@ const ReportLost = () => {
       setIsSubmitting(true);
       let imageUrl = null;
 
-      // Upload image if provided
       if (values.imageFile && values.imageFile.length > 0) {
         const file = values.imageFile[0];
         imageUrl = await uploadImage(file);
       }
 
-      // Submit to Supabase
       await createLostObject({
         object_name: values.objectName,
         description: values.description,
@@ -79,15 +70,15 @@ const ReportLost = () => {
       });
 
       toast({
-        title: "Report submitted",
-        description: "Your lost object report has been submitted successfully."
+        title: "✨ Report submitted successfully!",
+        description: "We'll help you find your item. Keep an eye on the listings!"
       });
 
       navigate("/listings");
     } catch (error: any) {
       toast({
-        title: "Error submitting report",
-        description: error.message || "An error occurred. Please try again.",
+        title: "Oops! Something went wrong",
+        description: error.message || "Please try again in a moment.",
         variant: "destructive"
       });
     } finally {
@@ -95,122 +86,169 @@ const ReportLost = () => {
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleImageChange = (file: File | null) => {
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
+      reader.onloadend = () => setImagePreview(reader.result as string);
       reader.readAsDataURL(file);
+      
+      // Create FileList for form
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      form.setValue('imageFile', dt.files);
+    } else {
+      setImagePreview(null);
+      form.setValue('imageFile', undefined);
     }
   };
 
-  const RequiredIndicator = () => <Star className="h-4 w-4 text-red-500 inline ml-1" fill="currentColor" />;
-  
   return (
-    <div className="bg-white min-h-screen">
-      <Navbar />
-      <div className="pt-28 pb-20 bg-gradient-to-br from-white to-grey/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-maroon mb-8">
-              Report a Lost Object
-            </h1>
-            
-            <div className="bg-white rounded-xl shadow-lg p-6 md:p-8">
-              <div className="mb-6 text-sm text-muted-foreground">
-                Fields marked with <Star className="h-3 w-3 text-red-500 inline mb-1" fill="currentColor" /> are required
+    <TooltipProvider>
+      <div className="bg-gradient-to-br from-white via-gray-50/30 to-mustard/5 min-h-screen">
+        <Navbar />
+        <div className="pt-28 pb-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              {/* Hero Section */}
+              <div className="text-center mb-12 space-y-4">
+                <div className="inline-flex items-center gap-2 bg-maroon/10 text-maroon px-4 py-2 rounded-full text-sm font-medium mb-4">
+                  <span>🔍</span>
+                  Lost Something?
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold text-maroon leading-tight">
+                  Let's help you find it faster!
+                </h1>
+                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                  Fill out the details below and our community will help you track down your missing item.
+                </p>
               </div>
-              
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField control={form.control} name="objectName" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg flex items-center">
-                        Object Name
-                        <RequiredIndicator />
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. Blue Laptop Bag" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  
-                  <FormField control={form.control} name="description" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg flex items-center">
-                        Description
-                        <RequiredIndicator />
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Please describe your object in detail (color, brand, distinguishing features, etc.)" className="min-h-[120px]" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <FormField control={form.control} name="location" render={({ field }) => (
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                  {/* Item Details Card */}
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-maroon/10 rounded-xl flex items-center justify-center">
+                        <span className="text-lg">🧾</span>
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-800">Item Details</h2>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FormField control={form.control} name="objectName" render={({ field, fieldState }) => (
+                        <FormItem>
+                          <FormControl>
+                            <FloatingInput
+                              label="What did you lose? *"
+                              error={fieldState.error?.message}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      
+                      <FormField control={form.control} name="lostDate" render={({ field }) => (
+                        <FormItem>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <div className="relative">
+                                  <Button
+                                    variant="outline"
+                                    className={`w-full h-14 px-4 pt-6 pb-2 text-left font-normal border-2 rounded-xl bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gray-300 focus:border-maroon/60 ${
+                                      !field.value ? "text-gray-500" : "text-gray-900"
+                                    }`}
+                                  >
+                                    {field.value ? format(field.value, "PPP") : ""}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                  <label className={`absolute left-4 transition-all duration-300 pointer-events-none ${
+                                    field.value ? "top-2 text-xs font-medium text-maroon" : "top-1/2 transform -translate-y-1/2 text-base text-gray-500"
+                                  }`}>
+                                    When did you last see it? *
+                                  </label>
+                                </div>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={date => date > new Date() || date < new Date("1900-01-01")}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+
+                    <div className="mt-6">
+                      <FormField control={form.control} name="description" render={({ field, fieldState }) => (
+                        <FormItem>
+                          <FormControl>
+                            <FloatingTextarea
+                              label="Describe your item in detail (color, brand, size, etc.) *"
+                              error={fieldState.error?.message}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+                  </div>
+
+                  {/* Location Info Card */}
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-mustard/10 rounded-xl flex items-center justify-center">
+                        <span className="text-lg">📍</span>
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-800">Location Info</h2>
+                    </div>
+                    
+                    <FormField control={form.control} name="location" render={({ field, fieldState }) => (
                       <FormItem>
-                        <FormLabel className="text-lg flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          Last at
-                          <RequiredIndicator />
-                        </FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-                            <Input className="pl-10" placeholder="e.g. Library, Block-C" {...field} />
+                            <FloatingInput
+                              label="Where did you last see it? *"
+                              error={fieldState.error?.message}
+                              {...field}
+                            />
+                            <MapPin className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                           </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
-                    
-                    <FormField control={form.control} name="lostDate" render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel className="text-lg flex items-center gap-2">
-                          <CalendarIcon className="w-4 h-4" /> 
-                          Last on
-                          <RequiredIndicator />
-                        </FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button variant={"outline"} className={`w-full pl-3 text-left font-normal ${!field.value ? "text-muted-foreground" : ""}`}>
-                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={date => date > new Date() || date < new Date("1900-01-01")} />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
                   </div>
 
-                  {/* Contact Information Section */}
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-medium mb-4">Contact Information</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Please provide your contact information so we can reach out to you if your object is found.
-                    </p>
+                  {/* Contact Info Card */}
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
+                        <span className="text-lg">📞</span>
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-800">Contact Info</h2>
+                    </div>
                     
                     <div className="grid md:grid-cols-2 gap-6">
-                      <FormField control={form.control} name="email" render={({ field }) => (
+                      <FormField control={form.control} name="email" render={({ field, fieldState }) => (
                         <FormItem>
-                          <FormLabel className="text-lg flex items-center gap-2">
-                            <Mail className="w-4 h-4" />
-                            Email
-                            <RequiredIndicator />
-                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., student@gitam.edu" type="email" {...field} />
+                            <div className="relative">
+                              <FloatingInput
+                                label="Your email address *"
+                                type="email"
+                                error={fieldState.error?.message}
+                                {...field}
+                              />
+                              <Mail className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -218,59 +256,74 @@ const ReportLost = () => {
                       
                       <FormField control={form.control} name="phone" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-lg flex items-center gap-2">
-                            <MessageCircle className="w-4 h-4" />
-                            WhatsApp Number (Optional)
-                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., +91 9876543210" type="tel" {...field} />
+                            <div className="relative">
+                              <FloatingInput
+                                label="WhatsApp number (optional)"
+                                type="tel"
+                                {...field}
+                              />
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Optional WhatsApp number for faster communication</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              <MessageCircle className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                            </div>
                           </FormControl>
-                          <FormDescription>
-                            Optional WhatsApp number for quicker communication
-                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )} />
                     </div>
                   </div>
 
-                  <FormField control={form.control} name="imageFile" render={({ field: { value, onChange, ...fieldProps } }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg flex items-center gap-2">
-                        <Image className="w-4 h-4" />
-                        Upload Image (Optional)
-                      </FormLabel>
-                      <FormControl>
-                        <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 transition-colors hover:border-primary/50">
-                          <Input type="file" accept="image/*" className="hidden" id="image-upload" onChange={e => {
-                            handleImageChange(e);
-                            onChange(e.target.files);
-                          }} {...fieldProps} />
-                          <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center justify-center w-full">
-                            {imagePreview ? (
-                              <div className="relative w-full">
-                                <img src={imagePreview} alt="Preview" className="mx-auto max-h-48 object-contain rounded-md" />
-                                <p className="text-sm text-center mt-2 text-muted-foreground">
-                                  Click to change image
-                                </p>
-                              </div>
-                            ) : (
-                              <>
-                                <Image className="h-10 w-10 text-muted-foreground mb-2" />
-                                <p className="text-sm text-center text-muted-foreground">Click to upload an image of your lost object</p>
-                              </>
-                            )}
-                          </label>
-                        </div>
-                      </FormControl>
-                      <FormDescription>Adding an image helps others recognize the object more easily.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+                  {/* Image Upload Card */}
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                        <span className="text-lg">📸</span>
+                      </div>
+                      <div className="flex-1">
+                        <h2 className="text-2xl font-bold text-gray-800">Add a Photo</h2>
+                        <p className="text-gray-600">A picture helps others recognize your item</p>
+                      </div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="text-gray-400 h-5 w-5 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Adding a photo increases your chances of finding your item!</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    
+                    <DragDropImage
+                      onImageChange={handleImageChange}
+                      preview={imagePreview}
+                    />
+                  </div>
 
-                  <div className="pt-4">
-                    <Button type="submit" className="w-full md:w-auto bg-maroon hover:bg-maroon/90 text-white" size="lg" disabled={isSubmitting}>
-                      {isSubmitting ? "Submitting..." : "Submit Report"}
+                  {/* Submit Button */}
+                  <div className="text-center pt-4">
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="bg-maroon hover:bg-mustard text-white font-semibold py-4 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:transform-none"
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Submitting...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span>✍️</span>
+                          Report Lost Item
+                        </div>
+                      )}
                     </Button>
                   </div>
                 </form>
@@ -278,9 +331,9 @@ const ReportLost = () => {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </TooltipProvider>
   );
 };
 
