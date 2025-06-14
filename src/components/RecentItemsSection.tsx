@@ -8,20 +8,20 @@ import { fetchLostObjects, fetchFoundObjects } from "@/services/supabaseApi";
 
 const RecentItemsSection = () => {
   // Fetch real data from the API
-  const { data: lostItems = [] } = useQuery({
+  const { data: lostObjects = [] } = useQuery({
     queryKey: ["lostObjects"],
     queryFn: fetchLostObjects,
   });
 
-  const { data: foundItems = [] } = useQuery({
+  const { data: foundObjects = [] } = useQuery({
     queryKey: ["foundObjects"],
     queryFn: fetchFoundObjects,
   });
 
-  // Combine and sort by creation date to get the most recent items
-  const allItems = [...lostItems, ...foundItems]
+  // Combine and sort by creation date to get the most recent objects
+  const allObjects = [...lostObjects, ...foundObjects]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 4); // Take only the 4 most recent items
+    .slice(0, 4); // Take only the 4 most recent objects
 
   // Animation variants
   const containerVariants = {
@@ -63,14 +63,14 @@ const RecentItemsSection = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center mb-12">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-maroon mb-2">Recently Reported Items</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-maroon mb-2">Recently Reported Objects</h2>
             <p className="text-lg text-gray-600">
-              Check out the latest lost and found items on campus
+              Check out the latest lost and found objects on campus
             </p>
           </div>
           <Link to="/listings">
             <button className="mt-4 md:mt-0 px-5 py-2 border-2 border-mustard text-mustard rounded-md hover:bg-mustard/10 font-medium transition-colors">
-              View All Items
+              View All Objects
             </button>
           </Link>
         </div>
@@ -82,7 +82,7 @@ const RecentItemsSection = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
         >
-          {allItems.map((item) => (
+          {allObjects.map((item) => (
             <motion.div key={`${item.type}-${item.id}`} variants={itemVariants}>
               <Link to="/listings" className="block">
                 <Card className="overflow-hidden hover-card h-full cursor-pointer hover:shadow-lg transition-shadow">
@@ -132,9 +132,9 @@ const RecentItemsSection = () => {
           ))}
         </motion.div>
 
-        {allItems.length === 0 && (
+        {allObjects.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No recent items to display</p>
+            <p className="text-gray-500">No recent objects to display</p>
           </div>
         )}
       </div>
