@@ -7,10 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { fetchUserLostObjects, fetchUserFoundObjects } from "@/services/supabaseApi";
 import { ListingObject } from "@/types/ListingTypes";
-import MyReportingCard from "@/components/my-reportings/MyReportingCard";
 import EditReportDialog from "@/components/my-reportings/EditReportDialog";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+// Import refactored child components:
+import MyAllReportsTab from "@/components/my-reportings/MyAllReportsTab";
+import MyLostReportsTab from "@/components/my-reportings/MyLostReportsTab";
+import MyFoundReportsTab from "@/components/my-reportings/MyFoundReportsTab";
 
 const MyReportings = () => {
   const [selectedItem, setSelectedItem] = useState<ListingObject | null>(null);
@@ -92,94 +95,28 @@ const MyReportings = () => {
             ) : (
               <>
                 <TabsContent value="all">
-                  {lostItems.length === 0 && foundItems.length === 0 ? (
-                    <div className="text-center py-12">
-                      <div className="text-6xl mb-4">📦</div>
-                      <h3 className="text-xl font-semibold text-gray-700 mb-2">No Reports Yet</h3>
-                      <p className="text-gray-500 mb-6">You haven't reported any lost or found items yet.</p>
-                      <div className="flex gap-4 justify-center">
-                        <Button 
-                          className="bg-maroon hover:bg-maroon/90"
-                          onClick={() => navigate("/report-lost")}
-                        >
-                          Report Lost Item
-                        </Button>
-                        <Button 
-                          className="bg-mustard hover:bg-mustard/90"
-                          onClick={() => navigate("/report-found")}
-                        >
-                          Report Found Item
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {[...lostItems, ...foundItems]
-                        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                        .map((item) => (
-                          <MyReportingCard
-                            key={`${item.type}-${item.id}`}
-                            item={item}
-                            onEdit={handleEdit}
-                            onDeleteSuccess={handleDeleteSuccess}
-                          />
-                        ))}
-                    </div>
-                  )}
+                  <MyAllReportsTab
+                    lostItems={lostItems}
+                    foundItems={foundItems}
+                    onEdit={handleEdit}
+                    onDeleteSuccess={handleDeleteSuccess}
+                  />
                 </TabsContent>
 
                 <TabsContent value="lost">
-                  {lostItems.length === 0 ? (
-                    <div className="text-center py-12">
-                      <div className="text-6xl mb-4">🔍</div>
-                      <h3 className="text-xl font-semibold text-gray-700 mb-2">No Lost Items Reported</h3>
-                      <p className="text-gray-500 mb-6">You haven't reported any lost items yet.</p>
-                      <Button 
-                        className="bg-maroon hover:bg-maroon/90"
-                        onClick={() => navigate("/report-lost")}
-                      >
-                        Report Lost Item
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {lostItems.map((item) => (
-                        <MyReportingCard
-                          key={`${item.type}-${item.id}`}
-                          item={item}
-                          onEdit={handleEdit}
-                          onDeleteSuccess={handleDeleteSuccess}
-                        />
-                      ))}
-                    </div>
-                  )}
+                  <MyLostReportsTab
+                    lostItems={lostItems}
+                    onEdit={handleEdit}
+                    onDeleteSuccess={handleDeleteSuccess}
+                  />
                 </TabsContent>
 
                 <TabsContent value="found">
-                  {foundItems.length === 0 ? (
-                    <div className="text-center py-12">
-                      <div className="text-6xl mb-4">✨</div>
-                      <h3 className="text-xl font-semibold text-gray-700 mb-2">No Found Items Reported</h3>
-                      <p className="text-gray-500 mb-6">You haven't reported any found items yet.</p>
-                      <Button 
-                        className="bg-mustard hover:bg-mustard/90"
-                        onClick={() => navigate("/report-found")}
-                      >
-                        Report Found Item
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {foundItems.map((item) => (
-                        <MyReportingCard
-                          key={`${item.type}-${item.id}`}
-                          item={item}
-                          onEdit={handleEdit}
-                          onDeleteSuccess={handleDeleteSuccess}
-                        />
-                      ))}
-                    </div>
-                  )}
+                  <MyFoundReportsTab
+                    foundItems={foundItems}
+                    onEdit={handleEdit}
+                    onDeleteSuccess={handleDeleteSuccess}
+                  />
                 </TabsContent>
               </>
             )}
