@@ -25,6 +25,14 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
     }
   };
 
+  // Log image load error for future debugging
+  const handleImgError = () => {
+    setImgError(true);
+    console.error(
+      `Failed to load image for ${item.object_name} (id: ${item.id}): ${item.image_url}`
+    );
+  };
+
   return (
     <Card
       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
@@ -43,9 +51,9 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
         {item.image_url && !imgError ? (
           <>
             {!imgLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 bg-gray-100">
+              <div className="absolute inset-0 flex items-center justify-center z-10 bg-gray-100 animate-fade-in">
                 <Skeleton className="w-full h-full" />
-                <Image className="w-8 h-8 text-gray-300 absolute" />
+                <Image className="w-8 h-8 text-gray-300 absolute animate-pulse" />
               </div>
             )}
             <img
@@ -54,12 +62,12 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
               loading="lazy"
               className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
               onLoad={() => setImgLoaded(true)}
-              onError={() => setImgError(true)}
+              onError={handleImgError}
               fetchPriority="low"
             />
           </>
         ) : imgError ? (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100 flex-col">
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 flex-col animate-fade-in">
             <ImageOff className="w-10 h-10 text-gray-400 mb-1" />
             <span className="text-xs text-gray-500">Image not available</span>
           </div>
@@ -96,3 +104,4 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
 };
 
 export default ListingCard;
+
