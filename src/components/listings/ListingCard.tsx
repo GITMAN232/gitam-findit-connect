@@ -55,7 +55,7 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
               className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
               onLoad={() => setImgLoaded(true)}
               onError={() => setImgError(true)}
-              fetchpriority="low"
+              fetchPriority="low"
             />
           </>
         ) : imgError ? (

@@ -31,7 +31,7 @@ const ListingDetailImage = ({ selectedItem }: ListingDetailImageProps) => {
               loading="lazy"
               onLoad={() => setImgLoaded(true)}
               onError={() => setImgError(true)}
-              fetchpriority="high"
+              fetchPriority="high"
             />
           </>
         ) : imgError ? (
