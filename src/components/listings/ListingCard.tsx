@@ -1,10 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { format } from "date-fns";
-import { MapPin, Calendar, Clock } from "lucide-react";
+import { MapPin, Calendar, Clock, Image, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { PublicListingObject } from "@/types/ListingTypes";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ListingCardProps {
   item: PublicListingObject;
@@ -12,9 +13,12 @@ interface ListingCardProps {
 }
 
 const ListingCard = ({ item, onClick }: ListingCardProps) => {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
   // Render date based on item type
   const renderDate = (item: PublicListingObject) => {
-    if (item.type === 'lost') {
+    if (item.type === "lost") {
       return format(new Date(item.lost_date), "PPP");
     } else {
       return format(new Date(item.found_date), "PPP");
@@ -22,11 +26,11 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
   };
 
   return (
-    <Card 
+    <Card
       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
       onClick={onClick}
     >
-      <div className="h-48 bg-gray-100 relative">
+      <div className="h-48 bg-gray-100 relative flex items-center justify-center overflow-hidden">
         <Badge
           className={`absolute top-3 left-3 ${
             item.type === "lost"
@@ -36,12 +40,29 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
         >
           {item.type === "lost" ? "Lost" : "Found"}
         </Badge>
-        {item.image_url ? (
-          <img
-            src={item.image_url}
-            alt={item.object_name}
-            className="w-full h-full object-cover"
-          />
+        {item.image_url && !imgError ? (
+          <>
+            {!imgLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 bg-gray-100">
+                <Skeleton className="w-full h-full" />
+                <Image className="w-8 h-8 text-gray-300 absolute" />
+              </div>
+            )}
+            <img
+              src={item.image_url}
+              alt={item.object_name}
+              loading="lazy"
+              className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setImgError(true)}
+              fetchpriority="low"
+            />
+          </>
+        ) : imgError ? (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 flex-col">
+            <ImageOff className="w-10 h-10 text-gray-400 mb-1" />
+            <span className="text-xs text-gray-500">Image not available</span>
+          </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100">
             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
