@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Mail, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ListingObject } from "@/types/ListingTypes";
 
@@ -8,57 +8,54 @@ interface ContactButtonsProps {
   item: ListingObject;
 }
 
+// Helpers for robust checks
+const getEmail = (item: ListingObject) => {
+  if (!item) return "";
+  return item.type === "lost"
+    ? (item as any).contact_info || ""
+    : (item as any).email || "";
+};
+const getPhone = (item: ListingObject) => {
+  if (!item) return "";
+  if (item.type === "found") return (item as any).phone || "";
+  return "";
+};
+
 const ContactButtons = ({ item }: ContactButtonsProps) => {
-  console.log('ContactButtons - item:', item);
-  console.log('ContactButtons - item type:', item.type);
-  
+  const email = getEmail(item);
+  const phone = getPhone(item);
+
   const handleWhatsAppClick = () => {
-    // Only found items have phone numbers in our current database structure
-    const phone = item.type === 'found' ? (item as any).phone : null;
-    console.log('WhatsApp click - phone:', phone);
-    
-    if (!phone) {
-      console.log('No phone number available for this item type');
-      return;
-    }
-    
-    // Clean phone number (remove spaces, dashes, etc.)
-    const cleanPhone = phone.replace(/[^\d+]/g, '');
-    
+    if (!phone) return;
+    const cleanPhone = phone.replace(/[^\d+]/g, "");
     const message = `Hi, I saw your report for "${item.object_name}" on the GITAM Lost & Found portal. Can we connect?`;
     const encodedMessage = encodeURIComponent(message);
-    
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
+    window.open(whatsappUrl, "_blank");
   };
 
   const handleEmailClick = () => {
-    const email = item.type === 'lost' ? (item as any).contact_info : (item as any).email;
     if (!email) return;
-    
     const subject = `Regarding your ${item.type} item: ${item.object_name}`;
     const body = `Hi, I saw your listing for "${item.object_name}" on G-Lost&Found and would like to connect.`;
-    
-    const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
     window.open(mailtoUrl);
   };
 
-  // Check for available contact methods
-  // Only found items have phone numbers in current database structure
-  const hasWhatsApp = item.type === 'found' && !!(item as any).phone;
-  const hasEmail = item.type === 'lost' ? !!(item as any).contact_info : !!(item as any).email;
-  
-  console.log('ContactButtons - hasWhatsApp:', hasWhatsApp);
-  console.log('ContactButtons - hasEmail:', hasEmail);
-  console.log('ContactButtons - phone value (found items only):', item.type === 'found' ? (item as any).phone : 'N/A for lost items');
-  console.log('ContactButtons - email value:', item.type === 'lost' ? (item as any).contact_info : (item as any).email);
+  // Availability of methods
+  const hasEmail = !!email;
+  const hasWhatsApp = !!phone;
 
   if (!hasEmail && !hasWhatsApp) {
-    console.log('No contact methods available');
     return (
       <div className="space-y-2">
         <h4 className="font-medium text-sm text-gray-700 mb-2">Quick Contact</h4>
-        <p className="text-sm text-gray-500">No contact information available</p>
+        <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded p-2">
+          <AlertTriangle className="h-4 w-4 text-yellow-500" />
+          <span className="text-sm text-yellow-800">No contact methods available.</span>
+        </div>
       </div>
     );
   }
@@ -78,7 +75,6 @@ const ContactButtons = ({ item }: ContactButtonsProps) => {
             Send Email
           </Button>
         )}
-        
         {hasWhatsApp && (
           <Button
             onClick={handleWhatsAppClick}
