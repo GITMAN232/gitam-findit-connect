@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PublicListingObject } from "@/types/ListingTypes";
 import { fetchLostObjects, fetchFoundObjects } from "@/services/supabaseApi";
@@ -76,8 +76,8 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
     setCurrentPage(prev => Math.min(totalPages, prev + 1));
   };
 
-  // Reset page when filters change
-  useMemo(() => {
+  // Reset page when filters change (useEffect instead of useMemo)
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, category, activeTab]);
 
