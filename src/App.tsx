@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -16,6 +15,7 @@ import ReportLost from "./pages/ReportLost";
 import ReportFound from "./pages/ReportFound";
 import Listings from "./pages/Listings";
 import MyReportings from "./pages/MyReportings";
+import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -31,41 +31,43 @@ const App = () => {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            
-            {/* Public listings page - no authentication required for browsing */}
-            <Route path="/listings" element={<Listings />} />
-            
-            {/* Protected routes for reporting */}
-            <Route path="/report-lost" element={
-              <ProtectedRoute>
-                <ReportLost />
-              </ProtectedRoute>
-            } />
-            <Route path="/report-found" element={
-              <ProtectedRoute>
-                <ReportFound />
-              </ProtectedRoute>
-            } />
-            <Route path="/my-reportings" element={
-              <ProtectedRoute>
-                <MyReportings />
-              </ProtectedRoute>
-            } />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <GlobalErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              
+              {/* Public listings page - no authentication required for browsing */}
+              <Route path="/listings" element={<Listings />} />
+              
+              {/* Protected routes for reporting */}
+              <Route path="/report-lost" element={
+                <ProtectedRoute>
+                  <ReportLost />
+                </ProtectedRoute>
+              } />
+              <Route path="/report-found" element={
+                <ProtectedRoute>
+                  <ReportFound />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-reportings" element={
+                <ProtectedRoute>
+                  <MyReportings />
+                </ProtectedRoute>
+              } />
+              
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </GlobalErrorBoundary>
   );
 };
 

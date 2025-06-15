@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -10,6 +9,7 @@ import FilterControls from "@/components/listings/FilterControls";
 import PaginationControls from "@/components/listings/PaginationControls";
 import EmptyState from "@/components/listings/EmptyState";
 import { useListings } from "@/hooks/useListings";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Listings = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +26,27 @@ const Listings = () => {
     selectedItem,
     setSelectedItem,
   } = useListings(searchQuery, category, activeTab);
+
+  // Helper to render loading skeletons (same count as grid cards)
+  const SkeletonGrid = () => {
+    const skeletonArr = Array.from({ length: 8 }); // for 8 cards on lg, fallback for lower grid as well
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {skeletonArr.map((_, idx) => (
+          <div className="rounded-xl bg-white border p-5 flex flex-col gap-4 shadow animate-pulse" key={idx}>
+            <Skeleton className="w-full h-40 rounded-lg" />
+            <Skeleton className="h-6 w-2/3 rounded" />
+            <Skeleton className="h-4 w-1/3 rounded" />
+            <Skeleton className="h-4 w-1/2 rounded" />
+            <div className="flex gap-2 mt-2">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <Skeleton className="h-10 w-16 rounded-md" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   // Fix scroll behavior - scroll to top when component mounts
   useEffect(() => {
@@ -75,9 +96,7 @@ const Listings = () => {
           />
 
           {isLoading ? (
-            <div className="flex items-center justify-center min-h-[400px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-maroon"></div>
-            </div>
+            <SkeletonGrid />
           ) : (
             <>
               {paginatedItems.length === 0 ? (
