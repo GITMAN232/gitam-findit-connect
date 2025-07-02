@@ -34,6 +34,11 @@ const Navbar = () => {
         <div className="flex items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
+            <img 
+              src="/lovable-uploads/18a8653d-6abc-413c-ae9b-d795f3d49b78.png" 
+              alt="G-Lost&Found Logo" 
+              className="w-10 h-10"
+            />
             <span className="font-bold text-xl text-maroon">G-Lost&Found</span>
           </Link>
 
