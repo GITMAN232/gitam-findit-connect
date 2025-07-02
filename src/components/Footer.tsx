@@ -8,11 +8,6 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <img 
-                src="/lovable-uploads/18a8653d-6abc-413c-ae9b-d795f3d49b78.png" 
-                alt="G-Lost&Found Logo" 
-                className="w-10 h-10"
-              />
               <span className="font-bold text-xl">
                 <span className="text-maroon">G-Lost</span>
                 <span className="text-mustard">&</span>
