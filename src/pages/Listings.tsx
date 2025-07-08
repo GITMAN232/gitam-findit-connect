@@ -10,11 +10,16 @@ import PaginationControls from "@/components/listings/PaginationControls";
 import EmptyState from "@/components/listings/EmptyState";
 import { useListings } from "@/hooks/useListings";
 import { Skeleton } from "@/components/ui/skeleton";
+import CampusSelector from "@/components/CampusSelector";
 
 const Listings = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All categories");
   const [activeTab, setActiveTab] = useState("all");
+  const [selectedCampus, setSelectedCampus] = useState<string | null>(
+    sessionStorage.getItem("selectedCampus")
+  );
+  const [showCampusSelector, setShowCampusSelector] = useState(!selectedCampus);
   
   const {
     isLoading,
@@ -25,7 +30,7 @@ const Listings = () => {
     handleNextPage,
     selectedItem,
     setSelectedItem,
-  } = useListings(searchQuery, category, activeTab);
+  } = useListings(searchQuery, category, activeTab, selectedCampus || undefined);
 
   // Helper to render loading skeletons (same count as grid cards)
   const SkeletonGrid = () => {
@@ -48,6 +53,13 @@ const Listings = () => {
     );
   };
 
+  // Handle campus selection
+  const handleCampusSelect = (campus: string) => {
+    setSelectedCampus(campus);
+    sessionStorage.setItem("selectedCampus", campus);
+    setShowCampusSelector(false);
+  };
+
   // Fix scroll behavior - scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -62,10 +74,25 @@ const Listings = () => {
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-maroon mb-2">
                 Lost & Found Objects
+                {selectedCampus && (
+                  <span className="text-lg font-normal text-gray-600 ml-2">
+                    - {selectedCampus} Campus
+                  </span>
+                )}
               </h1>
               <p className="text-muted-foreground">
                 Browse through all reported lost and found objects on campus
               </p>
+              {selectedCampus && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCampusSelector(true)}
+                  className="mt-2 text-xs"
+                >
+                  Change Campus
+                </Button>
+              )}
             </div>
             <div className="mt-4 md:mt-0 flex gap-2">
               <Button 
@@ -124,6 +151,13 @@ const Listings = () => {
           )}
         </div>
       </div>
+
+      {/* Campus Selection Dialog */}
+      <CampusSelector
+        isOpen={showCampusSelector}
+        onSelect={handleCampusSelect}
+        onOpenChange={setShowCampusSelector}
+      />
 
       {/* Object Detail Dialog */}
       <ListingDetail

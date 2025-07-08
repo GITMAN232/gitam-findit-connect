@@ -6,7 +6,7 @@ import { fetchLostObjects, fetchFoundObjects } from "@/services/supabaseApi";
 
 export const PAGE_SIZE = 8;
 
-export const useListings = (searchQuery: string, category: string, activeTab: string) => {
+export const useListings = (searchQuery: string, category: string, activeTab: string, selectedCampus?: string) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState<PublicListingObject | null>(null);
 
@@ -60,8 +60,13 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
       );
     }
 
+    // Apply campus filter
+    if (selectedCampus) {
+      items = items.filter(item => item.campus === selectedCampus);
+    }
+
     return items;
-  }, [lostItems, foundItems, searchQuery, category, activeTab]);
+  }, [lostItems, foundItems, searchQuery, category, activeTab, selectedCampus]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredItems.length / PAGE_SIZE);
@@ -79,7 +84,7 @@ export const useListings = (searchQuery: string, category: string, activeTab: st
   // Reset page when filters change (useEffect instead of useMemo)
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, category, activeTab]);
+  }, [searchQuery, category, activeTab, selectedCampus]);
 
   return {
     isLoading,

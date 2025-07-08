@@ -19,6 +19,8 @@ import { FloatingInput } from "@/components/ui/floating-input";
 import { FloatingTextarea } from "@/components/ui/floating-textarea";
 import { DragDropImage } from "@/components/ui/drag-drop-image";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { campuses } from "@/types/ListingTypes";
 
 const formSchema = z.object({
   objectName: z.string().min(2, "Object name must be at least 2 characters."),
@@ -27,6 +29,7 @@ const formSchema = z.object({
   lostDate: z.date({ required_error: "Please select a date when the object was lost." }),
   email: z.string().email("Please enter a valid email address."),
   phone: z.string().optional(),
+  campus: z.string().min(1, "Please select a campus."),
   imageFile: z.instanceof(FileList).optional()
 });
 
@@ -46,7 +49,8 @@ const ReportLost = () => {
       description: "",
       location: "",
       email: user?.email || "",
-      phone: ""
+      phone: "",
+      campus: ""
     }
   });
 
@@ -67,6 +71,7 @@ const ReportLost = () => {
         lost_date: values.lostDate.toISOString().split('T')[0],
         contact_info: values.email,
         image_url: imageUrl,
+        campus: values.campus,
       });
 
       toast({
@@ -125,6 +130,36 @@ const ReportLost = () => {
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                  {/* Campus Selection Card */}
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                        <span className="text-lg">🏫</span>
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-800">Campus Selection</h2>
+                    </div>
+                    
+                    <FormField control={form.control} name="campus" render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <SelectTrigger className="w-full h-14 px-4 text-left font-normal border-2 rounded-xl bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gray-300 focus:border-maroon/60">
+                              <SelectValue placeholder="Which Campus? *" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {campuses.map((campus) => (
+                                <SelectItem key={campus} value={campus}>
+                                  {campus}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+
                   {/* Object Details Card */}
                   <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300">
                     <div className="flex items-center gap-3 mb-6">

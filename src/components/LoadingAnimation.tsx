@@ -39,18 +39,15 @@ const LoadingAnimation = ({ onComplete }: LoadingAnimationProps) => {
           clearInterval(timer);
           setIsComplete(true);
 
-          const fadeOutTimer = setTimeout(() => {
+          setTimeout(() => {
             setShowFadeOut(true);
           }, 300);
 
-          const completeTimer = setTimeout(() => {
+          setTimeout(() => {
             onComplete();
           }, 1000);
 
-          return () => {
-            clearTimeout(fadeOutTimer);
-            clearTimeout(completeTimer);
-          };
+          return 100;
         }
 
         return Math.min(newProgress, 100);

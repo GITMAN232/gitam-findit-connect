@@ -8,6 +8,7 @@ export interface LostObjectData {
   lost_date: string;
   contact_info: string;
   image_url?: string;
+  campus: string;
 }
 
 export interface FoundObjectData {
@@ -18,6 +19,7 @@ export interface FoundObjectData {
   email: string;
   phone?: string;
   image_url?: string;
+  campus: string;
 }
 
 // Upload image to Supabase Storage with user-specific folder structure
@@ -85,6 +87,7 @@ export const fetchLostObjects = async (): Promise<PublicLostObject[]> => {
     created_at: item.created_at!,
     image_url: item.image_url,
     status: item.status!,
+    campus: item.campus!,
     type: 'lost' as const
   }));
 };
@@ -141,6 +144,7 @@ export const fetchFoundObjects = async (): Promise<PublicFoundObject[]> => {
     created_at: item.created_at!,
     image_url: item.image_url,
     status: item.status!,
+    campus: item.campus!,
     type: 'found' as const
   }));
 };

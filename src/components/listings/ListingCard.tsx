@@ -48,6 +48,11 @@ const ListingCard = ({ item, onClick }: ListingCardProps) => {
         >
           {item.type === "lost" ? "Lost" : "Found"}
         </Badge>
+        <Badge
+          className="absolute top-3 right-3 bg-blue-500 hover:bg-blue-600 text-white"
+        >
+          {item.campus}
+        </Badge>
         {item.image_url && !imgError ? (
           <>
             {!imgLoaded && (

@@ -9,6 +9,7 @@ export interface BaseObject {
   location: string;
   image_url: string | null;
   status: string;
+  campus: string;
 }
 
 // Database response types (without the type field)
@@ -33,6 +34,7 @@ export interface PublicLostObjectDB {
   created_at: string;
   image_url: string | null;
   status: string;
+  campus: string;
 }
 
 export interface PublicFoundObjectDB {
@@ -44,6 +46,7 @@ export interface PublicFoundObjectDB {
   created_at: string;
   image_url: string | null;
   status: string;
+  campus: string;
 }
 
 // Types for our listings with the type discriminator
@@ -78,4 +81,11 @@ export const categories = [
   "Clothing",
   "Accessories",
   "Others",
+];
+
+// Campus options
+export const campuses = [
+  "Vizag",
+  "Hyderabad",
+  "Bangalore",
 ];
