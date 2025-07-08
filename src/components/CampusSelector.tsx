@@ -24,11 +24,6 @@ const CampusSelector = ({ isOpen, onSelect, onOpenChange, defaultCampus }: Campu
         </DialogHeader>
         
         <div className="space-y-3 pt-4">
-          {defaultCampus && (
-            <div className="text-center text-sm text-gray-600 mb-3">
-              Last selected: <span className="font-medium text-maroon">{defaultCampus}</span>
-            </div>
-          )}
           {campuses.map((campus) => (
             <Button
               key={campus}
@@ -42,11 +37,6 @@ const CampusSelector = ({ isOpen, onSelect, onOpenChange, defaultCampus }: Campu
             >
               <span className="mr-3 text-xl">🏫</span>
               {campus}
-              {campus === defaultCampus && (
-                <span className="ml-2 text-xs bg-maroon text-white px-2 py-1 rounded-full">
-                  Previous
-                </span>
-              )}
             </Button>
           ))}
         </div>
