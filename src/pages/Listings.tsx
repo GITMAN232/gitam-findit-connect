@@ -77,46 +77,54 @@ const Listings = () => {
       <Navbar />
       <div className="pt-28 pb-20">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-maroon mb-2">
-                Lost & Found Objects
-                {selectedCampus && (
-                  <span className="text-lg font-normal text-gray-600 ml-2">
-                    - {selectedCampus} Campus
-                  </span>
-                )}
-              </h1>
-              <p className="text-muted-foreground">
-                Browse through all reported lost and found objects on campus
-              </p>
-              {selectedCampus && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowCampusSelector(true)}
-                  className="mt-2 text-xs"
+          <div className="mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-maroon mb-2">
+                  Lost & Found Objects
+                  {selectedCampus && (
+                    <span className="text-lg font-normal text-gray-600 ml-2">
+                      - {selectedCampus} Campus
+                    </span>
+                  )}
+                </h1>
+                <p className="text-muted-foreground">
+                  Browse through all reported lost and found objects on campus
+                </p>
+              </div>
+              <div className="mt-4 md:mt-0 flex gap-2">
+                <Button 
+                  variant="outline" 
+                  className="bg-maroon/10 hover:bg-maroon/20 text-maroon border-maroon"
+                  asChild
                 >
-                  Change Campus
+                  <Link to="/report-lost">Report Lost Object</Link>
                 </Button>
-              )}
+                <Button 
+                  variant="outline" 
+                  className="bg-mustard/10 hover:bg-mustard/20 text-mustard border-mustard"
+                  asChild
+                >
+                  <Link to="/report-found">Report Found Object</Link>
+                </Button>
+              </div>
             </div>
-            <div className="mt-4 md:mt-0 flex gap-2">
-              <Button 
-                variant="outline" 
-                className="bg-maroon/10 hover:bg-maroon/20 text-maroon border-maroon"
-                asChild
-              >
-                <Link to="/report-lost">Report Lost Object</Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                className="bg-mustard/10 hover:bg-mustard/20 text-mustard border-mustard"
-                asChild
-              >
-                <Link to="/report-found">Report Found Object</Link>
-              </Button>
-            </div>
+            
+            {/* Change Campus Button - Prominent and separate */}
+            {selectedCampus && (
+              <div className="flex justify-center mb-4">
+                <Button
+                  onClick={() => setShowCampusSelector(true)}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-3 text-lg"
+                >
+                  <span className="text-2xl">🏫</span>
+                  Switch Campus
+                  <span className="text-sm bg-white/20 px-3 py-1 rounded-full font-medium">
+                    Currently: {selectedCampus}
+                  </span>
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Filtering options */}
