@@ -16,10 +16,8 @@ const Listings = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All categories");
   const [activeTab, setActiveTab] = useState("all");
-  const [selectedCampus, setSelectedCampus] = useState<string | null>(
-    sessionStorage.getItem("selectedCampus")
-  );
-  const [showCampusSelector, setShowCampusSelector] = useState(!selectedCampus);
+  const [selectedCampus, setSelectedCampus] = useState<string | null>(null);
+  const [showCampusSelector, setShowCampusSelector] = useState(true);
   
   const {
     isLoading,
@@ -59,6 +57,15 @@ const Listings = () => {
     sessionStorage.setItem("selectedCampus", campus);
     setShowCampusSelector(false);
   };
+
+  // Load saved campus on mount but still show selector initially
+  useEffect(() => {
+    const savedCampus = sessionStorage.getItem("selectedCampus");
+    if (savedCampus) {
+      // Pre-select the saved campus in the selector, but still show it
+      setSelectedCampus(savedCampus);
+    }
+  }, []);
 
   // Fix scroll behavior - scroll to top when component mounts
   useEffect(() => {
@@ -157,6 +164,7 @@ const Listings = () => {
         isOpen={showCampusSelector}
         onSelect={handleCampusSelect}
         onOpenChange={setShowCampusSelector}
+        defaultCampus={sessionStorage.getItem("selectedCampus")}
       />
 
       {/* Object Detail Dialog */}
