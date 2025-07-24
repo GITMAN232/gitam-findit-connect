@@ -14,21 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      "data found": {
-        Row: {
-          created_at: string
-          id: number
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-        }
-        Update: {
-          created_at?: string
-          id?: number
-        }
-        Relationships: []
-      }
       found_objects: {
         Row: {
           campus: string
