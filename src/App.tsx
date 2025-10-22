@@ -16,6 +16,13 @@ import ReportFound from "./pages/ReportFound";
 import Listings from "./pages/Listings";
 import MyReportings from "./pages/MyReportings";
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
+import AdminRoute from "./components/admin/AdminRoute";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import PendingSubmissions from "./pages/admin/PendingSubmissions";
+import LiveItems from "./pages/admin/LiveItems";
+import ClaimsManagement from "./pages/admin/ClaimsManagement";
+import ActivityLogs from "./pages/admin/ActivityLogs";
+import UsersManagement from "./pages/admin/UsersManagement";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +66,38 @@ const App = () => {
                 <ProtectedRoute>
                   <MyReportings />
                 </ProtectedRoute>
+              } />
+              
+              {/* Admin routes */}
+              <Route path="/admin" element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              } />
+              <Route path="/admin/pending" element={
+                <AdminRoute>
+                  <PendingSubmissions />
+                </AdminRoute>
+              } />
+              <Route path="/admin/live" element={
+                <AdminRoute>
+                  <LiveItems />
+                </AdminRoute>
+              } />
+              <Route path="/admin/claims" element={
+                <AdminRoute>
+                  <ClaimsManagement />
+                </AdminRoute>
+              } />
+              <Route path="/admin/activity" element={
+                <AdminRoute>
+                  <ActivityLogs />
+                </AdminRoute>
+              } />
+              <Route path="/admin/users" element={
+                <AdminRoute>
+                  <UsersManagement />
+                </AdminRoute>
               } />
               
               {/* Catch-all route */}

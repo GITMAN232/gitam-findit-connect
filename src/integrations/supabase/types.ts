@@ -7,15 +7,93 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string | null
+          details: Json | null
+          entity_id: string
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id: string
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      claims: {
+        Row: {
+          admin_id: string | null
+          admin_note: string | null
+          claimant_id: string
+          created_at: string | null
+          evidence_urls: string[] | null
+          explanation: string | null
+          id: string
+          item_id: string
+          item_type: string
+          reviewed_at: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          admin_note?: string | null
+          claimant_id: string
+          created_at?: string | null
+          evidence_urls?: string[] | null
+          explanation?: string | null
+          id?: string
+          item_id: string
+          item_type: string
+          reviewed_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          admin_note?: string | null
+          claimant_id?: string
+          created_at?: string | null
+          evidence_urls?: string[] | null
+          explanation?: string | null
+          id?: string
+          item_id?: string
+          item_type?: string
+          reviewed_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       found_objects: {
         Row: {
+          admin_note: string | null
+          approved_at: string | null
+          approved_by: string | null
           campus: string
           created_at: string
           description: string
@@ -31,6 +109,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin_note?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           campus?: string
           created_at?: string
           description: string
@@ -46,6 +127,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin_note?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           campus?: string
           created_at?: string
           description?: string
@@ -64,6 +148,9 @@ export type Database = {
       }
       lost_objects: {
         Row: {
+          admin_note: string | null
+          approved_at: string | null
+          approved_by: string | null
           campus: string
           contact_info: string
           created_at: string
@@ -78,6 +165,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin_note?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           campus?: string
           contact_info: string
           created_at?: string
@@ -92,6 +182,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin_note?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           campus?: string
           contact_info?: string
           created_at?: string
@@ -103,6 +196,60 @@ export type Database = {
           object_name?: string
           status?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          related_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          related_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          related_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
         Relationships: []
@@ -183,10 +330,16 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -313,6 +466,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
