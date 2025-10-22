@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, User, LogOut, ChevronDown } from "lucide-react";
+import { Menu, User, LogOut, ChevronDown, Shield } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdmin } from "@/hooks/useAdmin";
+import { NotificationBell } from "./NotificationBell";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -81,6 +84,19 @@ const Navbar = () => {
               </Link>
             )}
 
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className="flex items-center gap-1 text-maroon hover:text-maroon/80 transition-colors font-medium"
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
+
+            {/* Notification Bell */}
+            {user && <NotificationBell />}
+
             {/* User actions */}
             {user ? (
               <DropdownMenu>
@@ -144,6 +160,14 @@ const Navbar = () => {
                 {user && (
                   <DropdownMenuItem asChild>
                     <Link to="/my-reportings" className="w-full">My Reports</Link>
+                  </DropdownMenuItem>
+                )}
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin" className="w-full flex items-center">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin Portal
+                    </Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />

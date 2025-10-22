@@ -23,6 +23,7 @@ import LiveItems from "./pages/admin/LiveItems";
 import ClaimsManagement from "./pages/admin/ClaimsManagement";
 import ActivityLogs from "./pages/admin/ActivityLogs";
 import UsersManagement from "./pages/admin/UsersManagement";
+import AdminSetup from "./pages/AdminSetup";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => {
               } />
               
               {/* Admin routes */}
+              <Route path="/admin-setup" element={<AdminSetup />} />
               <Route path="/admin" element={
                 <AdminRoute>
                   <AdminDashboard />

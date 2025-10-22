@@ -76,10 +76,10 @@ const ReportLost = () => {
 
       toast({
         title: "✨ Report submitted successfully!",
-        description: "We'll help you find your object. Keep an eye on the listings!"
+        description: "Your submission is pending admin approval. You'll be notified once it's live!"
       });
 
-      navigate("/listings");
+      navigate("/my-reportings");
     } catch (error: any) {
       toast({
         title: "Oops! Something went wrong",

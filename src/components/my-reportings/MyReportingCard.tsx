@@ -79,10 +79,16 @@ const MyReportingCard = ({ item, onEdit, onDeleteSuccess }: MyReportingCardProps
           {item.type === "lost" ? "Lost" : "Found"}
         </Badge>
         <Badge
-          variant="secondary"
-          className="absolute top-3 right-3 bg-white text-gray-700"
+          variant={
+            item.status === 'approved' ? 'default' : 
+            item.status === 'rejected' ? 'destructive' : 
+            item.status === 'claimed' ? 'secondary' :
+            item.status === 'pending' ? 'outline' :
+            'secondary'
+          }
+          className="absolute top-3 right-3 capitalize"
         >
-          {item.status}
+          {item.status || 'pending'}
         </Badge>
         {item.image_url ? (
           <img
