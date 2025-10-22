@@ -1,4 +1,4 @@
-import { ClipboardList, CheckCircle, FileText, Users, Activity, LayoutDashboard } from 'lucide-react';
+import { ClipboardList, CheckCircle, FileText, Users, Activity, LayoutDashboard, Search } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -9,6 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarHeader,
   useSidebar,
 } from '@/components/ui/sidebar';
 
@@ -36,9 +37,27 @@ export function AdminSidebar() {
 
   return (
     <Sidebar className={collapsed ? 'w-14' : 'w-60'} collapsible="icon">
+      <SidebarHeader className="border-b p-4">
+        {!collapsed && (
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 bg-maroon rounded-lg flex items-center justify-center flex-shrink-0">
+              <Search className="h-5 w-5 text-white" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold text-maroon truncate">G Lost & Found</h2>
+              <p className="text-xs text-muted-foreground">Admin Portal</p>
+            </div>
+          </div>
+        )}
+        {collapsed && (
+          <div className="h-10 w-10 bg-maroon rounded-lg flex items-center justify-center mx-auto">
+            <Search className="h-5 w-5 text-white" />
+          </div>
+        )}
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Admin Portal</SidebarGroupLabel>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
